@@ -1,9 +1,9 @@
-﻿<UserControl x:Class="DrawUIExplorer.ControlUI"
+﻿<UserControl x:Class="br.corp.bonus630.DrawUIExplorer.ControlUI"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:DrawUIExplorer"
+             xmlns:local="clr-namespace:br.corp.bonus630.DrawUIExplorer"
              mc:Ignorable="d" 
              Height="24" Width="24" Loaded="UserControl_Loaded">
     <UserControl.Resources>
@@ -16,12 +16,12 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
-        <Button Content="B" Name="btn_Command" >
+        <Button Content="" Name="btn_Command" Style="{StaticResource controlUI.Button}" >
             <Button.ToolTip>
                 <ToolTip>
                     <StackPanel>
                         <Label Content="DrawUI Explorer" FontWeight="Bold" FontSize="12"/>
-                        <Label Content="Click ME!" FontSize="11"/>
+                        <Label Content="Open a XML file. Will open a new Dialog" FontSize="11"/>
                     </StackPanel>
                 </ToolTip>
             </Button.ToolTip>

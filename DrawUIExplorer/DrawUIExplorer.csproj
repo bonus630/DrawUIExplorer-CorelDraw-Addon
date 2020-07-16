@@ -8,10 +8,11 @@
     <ProjectGuid>{3FDDACEF-411B-48A6-9714-6306B9676780}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DrawUIExplorer</RootNamespace>
+    <RootNamespace>br.corp.bonus630.DrawUIExplorer</RootNamespace>
     <AssemblyName>DrawUIExplorer</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'X7 Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,33 +32,37 @@
     <DefineConstants>DEBUG;TRACE;X7</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'X7 Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\X7\</OutputPath>
     <OutDir>bin\Release\X7\$(SolutionName)</OutDir>
     <DefineConstants>TRACE;X7</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'X8 Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;X8</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;X8;Debug</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'X8 Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\X8\</OutputPath>
     <OutDir>bin\Release\X8\$(SolutionName)</OutDir>
     <DefineConstants>TRACE;X8</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == '2017 Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -66,15 +72,17 @@
     <DefineConstants>DEBUG;TRACE;X9</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == '2017 Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\2017\</OutputPath>
     <OutDir>bin\Release\2017\$(SolutionName)</OutDir>
     <DefineConstants>TRACE;X9</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == '2018 Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -84,15 +92,17 @@
     <DefineConstants>DEBUG;TRACE;X10</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == '2018 Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\2018\</OutputPath>
     <OutDir>bin\Release\2018\$(SolutionName)</OutDir>
     <DefineConstants>TRACE;X10</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == '2019 Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -102,15 +112,17 @@
     <DefineConstants>DEBUG;TRACE;X11</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == '2019 Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\2019\</OutputPath>
     <OutDir>bin\Release\2019\$(SolutionName)</OutDir>
     <DefineConstants>TRACE;X11</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <OutputType>Library</OutputType>
@@ -118,6 +130,9 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -126,8 +141,10 @@
     <Reference Include="System.Xaml" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="UIAutomationProvider" />
     <Reference Include="WindowsBase" />
     <Reference Include="System.Drawing" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup Label="VGCoreReferences">
     <Reference Label="X7Reference" Include="c:\program files\corel\coreldraw graphics suite x7\programs64\Assemblies\Corel.Interop.VGCore.dll" Condition="'$(Configuration)'=='X7 Debug'">
@@ -172,19 +189,108 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\Config.xaml.cs">
+      <DependentUpon>Config.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\InputCommandsView.xaml.cs">
+      <DependentUpon>InputCommandsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Core.cs" />
+    <Compile Include="CorelAutomation.cs" />
+    <Compile Include="Details.xaml.cs">
+      <DependentUpon>Details.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ExtensionsMethods.cs" />
+    <Compile Include="InputCommands.cs" />
+    <Compile Include="OverlayForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OverlayForm.Designer.cs">
+      <DependentUpon>OverlayForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Search.xaml.cs">
+      <DependentUpon>Search.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SearchEngine.cs" />
+    <Compile Include="ViewModel\Commands\AttributeCommand.cs" />
+    <Compile Include="WinAPI.cs" />
+    <Compile Include="WorkspaceUnzip.cs" />
+    <Compile Include="XMLDecoder.cs" />
+    <Compile Include="XMLEncoder.cs" />
+    <Compile Include="XMLTagWindow.xaml.cs">
+      <DependentUpon>XMLTagWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="XSLTEster.xaml.cs">
+      <DependentUpon>XSLTEster.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Controls\Config.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\InputCommandsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\TreeViewItemCustom.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="ControlUI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Compile Include="Controls\ButtonImage.cs" />
+    <Compile Include="Controls\MenuItemData.cs" />
+    <Compile Include="Controls\TreeViewItemCustom.xaml.cs">
+      <DependentUpon>TreeViewItemCustom.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\TreeViewItemData.cs" />
     <Compile Include="ControlUI.xaml.cs">
+      <DependentUpon>ControlUI.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Converters\BoolHeightConverter.cs" />
+    <Compile Include="Converters\BoolMediaSourceConverter.cs" />
+    <Compile Include="Converters\BoolVisibilityConverter.cs" />
+    <Compile Include="Converters\IntVisibilityConverter.cs" />
     <Compile Include="Converters\ResourceToMediaImageConverter.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="CorelControls\CorelControlBase.cs" />
+    <Compile Include="CorelControls\CorelControlList.cs" />
+    <Compile Include="DataClass\Attribute.cs" />
+    <Compile Include="DataClass\BasicData.cs" />
+    <Compile Include="DataClass\CommandBarData.cs" />
+    <Compile Include="DataClass\ContainerData.cs" />
+    <Compile Include="DataClass\DialogData.cs" />
+    <Compile Include="DataClass\DockerData.cs" />
+    <Compile Include="DataClass\FrameData.cs" />
+    <Compile Include="DataClass\IBasicData.cs" />
+    <Compile Include="DataClass\ItemData.cs" />
+    <Compile Include="DataClass\otherData.cs" />
+    <Compile Include="DataClass\StateData.cs" />
+    <Compile Include="DataClass\UIConfig.cs" />
+    <Compile Include="DataClass\UserData.cs" />
+    <Compile Include="DataClass\ViewData.cs" />
     <Compile Include="MessageBox.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Details.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Search.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="XMLTagWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="XSLTEster.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Include="Resources\Images.xaml">
@@ -214,10 +320,14 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <EmbeddedResource Include="OverlayForm.resx">
+      <DependentUpon>OverlayForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="Design\projectGuides.guides" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -228,8 +338,22 @@
     <Content Include="AppUI.xslt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\collapseArrow.png" />
+    <Content Include="Assets\copy.png" />
+    <Content Include="Assets\copy_icon.ico" />
+    <Content Include="Assets\expandArrow.png" />
+    <Content Include="Assets\light.png" />
+    <Content Include="Assets\paste.png" />
+    <Content Include="Assets\paste_icon.ico" />
+    <Content Include="Assets\search.png" />
+    <None Include="Assets\setting.png" />
+    <Content Include="Assets\trash.png" />
+    <Content Include="Assets\visibleDisable.bmp" />
+    <Content Include="Assets\visibleEnable.bmp" />
+    <Content Include="Assets\xml-file.png" />
     <Content Include="UserUI.xslt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="CorelDrw.addon">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

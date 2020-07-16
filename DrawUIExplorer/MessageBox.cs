@@ -1,4 +1,4 @@
-﻿namespace DrawUIExplorer
+﻿namespace br.corp.bonus630.DrawUIExplorer
 {
     public static class MessageBox
     {

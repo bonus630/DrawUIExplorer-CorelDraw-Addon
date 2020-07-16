@@ -43,7 +43,7 @@ This file defines new UI elements that all workspaces will contain
 
       <itemData guid="f08432a3-7d56-437a-b229-5d8f11137d19"
                 type="wpfhost"
-                hostedType="Addons\DrawUIExplorer\DrawUIExplorer.dll,DrawUIExplorer.ControlUI"
+                hostedType="Addons\DrawUIExplorer\DrawUIExplorer.dll,br.corp.bonus630.DrawUIExplorer.ControlUI"
                 enable="true"/>
 
     </xsl:copy>

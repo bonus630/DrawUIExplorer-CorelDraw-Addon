@@ -1,25 +1,21 @@
 ﻿using System;
-using System.Linq;
-using System.Text;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using corel = Corel.Interop.VGCore;
+using System.Runtime.InteropServices;
+using System.Windows.Interop;
+using Microsoft.Win32;
 
-namespace DrawUIExplorer
+namespace br.corp.bonus630.DrawUIExplorer
 {
 
     public partial class ControlUI : UserControl
     {
-        private corel.Application corelApp;
+        private corel.Application corelApp = null;
+        XMLTagWindow xMLTagsForm;
+        public static IntPtr corelHandle;
+        
         private string currentTheme;
         public ControlUI(object app)
         {
@@ -28,14 +24,51 @@ namespace DrawUIExplorer
             {
                 this.corelApp = app as corel.Application;
                 this.corelApp.OnApplicationEvent += CorelApp_OnApplicationEvent;
+                LoadThemeFromPreference();
             }
             catch (Exception)
             {
                 global::System.Windows.MessageBox.Show("VGCore Erro");
             }
-            btn_Command.Click += (s, e) => { corelApp.MsgShow("Working"); };
+            string filePath = "";
+//#if Debug
+//             filePath = "C:\\Users\\bonus\\AppData\\Roaming\\Corel\\CorelDRAW Graphics Suite X8\\Draw\\Workspace\\_default.cdws";
+//            CallXMLForm(filePath);
+//             return;
+//#endif
+            btn_Command.Click += (s, e) => {
+                OpenFileDialog of = new OpenFileDialog();
+                of.Filter = "DrawUI|*.xml|Workspace file|*.cdws";
+                if (!(bool)of.ShowDialog())
+                    return;
+                filePath = of.FileName;
+
+                CallXMLForm(filePath);
+            };
         }
-        #region theme select
+        public async Task save()
+        {
+            await Task.Run(
+                new Action(() => {
+                    corelApp.ActiveDocument.Save();
+                })
+                );
+
+        }
+        [DllImport("user32.dll")]
+        static extern IntPtr GetFocus();
+        private void CallXMLForm(string filePath)
+        {
+            xMLTagsForm = new XMLTagWindow(this.corelApp, filePath);
+            xMLTagsForm.Closed += (s, e) => { xMLTagsForm = null; };
+            IntPtr ownerWindowHandler = GetFocus();
+            ControlUI.corelHandle = ownerWindowHandler;
+            WindowInteropHelper helper = new WindowInteropHelper(xMLTagsForm);
+            helper.Owner = ownerWindowHandler;
+            xMLTagsForm.Show();
+            xMLTagsForm.StartProcess(filePath);
+        }
+#region theme select
         //Keys resources name follow the resource order to add a new value, order to works you need add 5 resources colors and Resources/Colors.xaml
         //1º is default, is the same name of StyleKeys string array
         //2º add LightestGrey. in start name of 1º for LightestGrey style in corel
@@ -43,20 +76,15 @@ namespace DrawUIExplorer
         //4º DarkGrey
         //5º Black
         private readonly string[] StyleKeys = new string[] {
-         "Button.MouseOver.Background" ,
-         "Button.MouseOver.Border",
-         "Button.Static.Border" ,
-         "Button.Static.Background" ,
-         "Button.Pressed.Background" ,
-         "Button.Pressed.Border" ,
-         "Button.Disabled.Foreground",
-         "Button.Disabled.Background",
-         "Default.Static.Foreground" ,
-         "Container.Text.Static.Background" ,
-         "Container.Text.Static.Foreground" ,
-         "Container.Static.Background" ,
-         "Default.Static.Inverted.Foreground" ,
-         "ComboBox.Border.Popup.Item.MouseOver"
+         "ControlUI.Button.MouseOver.Background" ,
+         "ControlUI.Button.MouseOver.Border",
+         "ControlUI.Button.Static.Border" ,
+         "ControlUI.Button.Static.Background" ,
+         "ControlUI.Button.Pressed.Background" ,
+         "ControlUI.Button.Pressed.Border" ,
+         "ControlUI.Container.Static.Background",
+         "ControlUI.Default.Static.Foreground" 
+
   };
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
@@ -82,7 +110,7 @@ namespace DrawUIExplorer
         {
             try
             {
-                string result;
+                string result = string.Empty;
 #if X8
                  result = corelApp.GetApplicationPreferenceValue("WindowScheme", "Colors").ToString();
 #endif
@@ -104,6 +132,6 @@ namespace DrawUIExplorer
             catch { }
 
         }
-        #endregion
+#endregion
     }
 }
