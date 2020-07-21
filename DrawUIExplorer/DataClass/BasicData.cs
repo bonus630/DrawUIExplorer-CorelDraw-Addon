@@ -133,7 +133,8 @@ namespace br.corp.bonus630.DrawUIExplorer.DataClass
             if (obj == null)
                 return false;
             IBasicData basicData = obj as IBasicData;
-            if (this.TagName == basicData.TagName && this.Guid == basicData.Guid)
+            //This comparison can't still work in merge case
+            if (this.TagName == basicData.TagName && this.Guid == basicData.Guid && this.XmlChildreID == basicData.XmlChildreID)
                 return true;
             return false;
         }

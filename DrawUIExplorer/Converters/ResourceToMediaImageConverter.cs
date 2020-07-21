@@ -41,8 +41,8 @@ namespace DrawUIExplorer.Converters
         }
         private System.Drawing.Bitmap GetBitmap(string ResourceName)
         {
-            ResourceManager rm = new ResourceManager("DrawUIExplorer.Properties.Resources",
-            Assembly.GetExecutingAssembly());
+            ResourceManager rm = new ResourceManager("br.corp.bonus630.DrawUIExplorer.Properties.Resources",
+            typeof(br.corp.bonus630.DrawUIExplorer.Properties.Resources).Assembly);
             try
             {
                 return (System.Drawing.Bitmap)rm.GetObject(ResourceName);

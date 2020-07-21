@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace br.corp.bonus630.DrawUIExplorer
+namespace br.corp.bonus630.DrawUIExplorer.Models
 {
     public class InputCommands
     {

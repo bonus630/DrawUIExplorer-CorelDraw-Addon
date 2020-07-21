@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace br.corp.bonus630.DrawUIExplorer.ViewModel.Commands
+namespace br.corp.bonus630.DrawUIExplorer.ViewModels.Commands
 {
     public class AttributeCommand : ICommand
     {

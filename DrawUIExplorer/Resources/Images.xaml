@@ -3,9 +3,39 @@
                     xmlns:System="clr-namespace:System;assembly=mscorlib"
                     xmlns:Converters="clr-namespace:DrawUIExplorer.Converters">
     <Converters:ResourceToMediaImageConverter x:Key="ResourceToMediaImageConverter" />
-    <!-- Usage exemple-->
-    <!--<System:String x:Key="OpenFolder">Opened_Folder_32px</System:String>
-    <Style x:Key="OpenFolderImage" TargetType="Image">
-        <Setter Property="Source" Value="{Binding Source={StaticResource OpenFolder},Converter={StaticResource ResourceToMediaImageConverter}}"/>
-    </Style>-->
+    
+    <System:String x:Key="light">light</System:String>
+    <Style x:Key="HighLightButtonImg" TargetType="Image">
+        <Setter Property="Source" Value="{Binding Source={StaticResource light},Converter={StaticResource ResourceToMediaImageConverter}}"/>
+    </Style>
+    <System:String x:Key="search">search</System:String>
+    <Style x:Key="SearchButtonImg" TargetType="Image">
+        <Setter Property="Source" Value="{Binding Source={StaticResource search},Converter={StaticResource ResourceToMediaImageConverter}}"/>
+    </Style>
+    <System:String x:Key="trash">trash</System:String>
+    <Style x:Key="ClearConsoleButtonImg" TargetType="Image">
+        <Setter Property="Source" Value="{Binding Source={StaticResource trash},Converter={StaticResource ResourceToMediaImageConverter}}"/>
+    </Style>
+    <System:String x:Key="copy">copy</System:String>
+    <Style x:Key="CopyMenuItemImg" TargetType="Image">
+        <Setter Property="Source" Value="{Binding Source={StaticResource copy},Converter={StaticResource ResourceToMediaImageConverter}}"/>
+    </Style>
+    <System:String x:Key="paste">paste</System:String>
+    <Style x:Key="PasteMenuItemImg" TargetType="Image">
+        <Setter Property="Source" Value="{Binding Source={StaticResource paste},Converter={StaticResource ResourceToMediaImageConverter}}"/>
+    </Style>
+    <System:String x:Key="setting">setting</System:String>
+    <Style x:Key="ConfigButtonImg" TargetType="Image">
+        <Setter Property="Source" Value="{Binding Source={StaticResource setting},Converter={StaticResource ResourceToMediaImageConverter}}"/>
+    </Style>
+    <System:String x:Key="expandArrow">expandArrow</System:String>
+    <Style x:Key="ConsoleCollapse" TargetType="Image">
+        <Setter Property="Source" Value="{Binding Source={StaticResource expandArrow},Converter={StaticResource ResourceToMediaImageConverter}}"/>
+    </Style>
+    <System:String x:Key="collapseArrow">collapseArrow</System:String>
+    <Style x:Key="ConsoleExpanded" TargetType="Image">
+        <Setter Property="Source" Value="{Binding Source={StaticResource collapseArrow},Converter={StaticResource ResourceToMediaImageConverter}}"/>
+    </Style>
+    
+
 </ResourceDictionary>

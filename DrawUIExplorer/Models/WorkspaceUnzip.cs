@@ -7,7 +7,7 @@ using System.IO.Compression;
 using System.IO;
 using System.Drawing;
 
-namespace br.corp.bonus630.DrawUIExplorer
+namespace br.corp.bonus630.DrawUIExplorer.Models
 {
     public class WorkspaceUnzip :IDisposable
     {

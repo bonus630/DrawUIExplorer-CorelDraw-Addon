@@ -1,20 +1,15 @@
-﻿using System;
+﻿using br.corp.bonus630.DrawUIExplorer.DataClass;
+using br.corp.bonus630.DrawUIExplorer.Models;
+using br.corp.bonus630.DrawUIExplorer.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Interop;
-using System.Windows.Media;
-using System.Linq;
-using Microsoft.Win32;
-using br.corp.bonus630.DrawUIExplorer.DataClass;
-using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Reflection;
-using Corel.Interop.VGCore;
+using System.Windows;
+using System.Windows.Controls;
 
-namespace br.corp.bonus630.DrawUIExplorer
+namespace br.corp.bonus630.DrawUIExplorer.Views
 {
 
     public partial class XMLTagWindow : System.Windows.Window
@@ -29,6 +24,7 @@ namespace br.corp.bonus630.DrawUIExplorer
         int msgCount = 1;
         bool cancelTreeGeneration = false;
         Thread th = null;
+        XMLTagWindowViewModel dataContext;
         //public static bool inCorel = true;
         private Corel.Interop.VGCore.Application app;
 
@@ -57,8 +53,10 @@ namespace br.corp.bonus630.DrawUIExplorer
             treeView_Nodes.Items.Clear();
             treeView_Search.Items.Clear();
             msgCount = 1;
-            this.DataContext = core;
+            dataContext = new XMLTagWindowViewModel(core);
+            this.DataContext = dataContext;
             core.StartCore(filePath, this.app);
+            dataContext.Title = filePath;
             corelCmd = new CorelAutomation(this.app, core);
             core.LoadXmlFinish += Core_LoadFinish;
             core.FilePorcentLoad += Core_FilePorcentLoad;
@@ -68,7 +66,7 @@ namespace br.corp.bonus630.DrawUIExplorer
             core.SearchResultEvent += Core_SearchResultEvent;
             core.LoadFinish += Core_LoadFinish1;
             core.NewMessage += Core_NewMessage;
-
+            dataContext.InCorel = core.InCorel;
             treeView_Nodes.GotFocus += (s, e) => { if (treeView_Nodes.SelectedItem != null) UpdateDetails(treeView_Nodes.SelectedItem, e); };
             treeView_Ref.GotFocus += (s, e) => { if (treeView_Ref.SelectedItem != null) UpdateDetails(treeView_Ref.SelectedItem, e); };
             treeView_Search.GotFocus += (s, e) => { if (treeView_Search.SelectedItem != null) UpdateDetails(treeView_Search.SelectedItem, e); };
@@ -103,12 +101,12 @@ namespace br.corp.bonus630.DrawUIExplorer
         private void Core_LoadListsFinish()
         {
             SetProgressBar(false, false);
-            this.Dispatcher.Invoke(new Action(() =>
+             this.Dispatcher.Invoke(new Action(() =>
             {
                 //this.DataContext = core;
                 InflateTreeView(core.ListPrimaryItens, treeView_Nodes);
                 tabControl_details.Visibility = Visibility.Visible;
-                search = new Search(core.SearchEngineGet, core);
+                search = new Search(core);
                 grid_search.Children.Add(search);
                 details = new Details(core);
                 grid_details.Children.Add(details);
@@ -231,7 +229,7 @@ namespace br.corp.bonus630.DrawUIExplorer
         {
             cancelTreeGeneration = false;
             TreeViewItemData children = sender as TreeViewItemData;
-            if (children.IsCreated)
+            if (children.IsCreated || children == null || children.Data.Childrens.Count == 0)
                 return;
             SetProgressBar(false, true, string.Format("{0}-Loading itens to treeView", DateTime.Now.ToLongTimeString()));
        
@@ -334,9 +332,9 @@ namespace br.corp.bonus630.DrawUIExplorer
                 else
                     gridRef.Visibility = Visibility.Visible;
             }
-            details.Update(data);
-            search.Update(data);
-            xslTester.Update(data);
+            //details.Update(data);
+            //search.Update(data);
+            //xslTester.Update(data);
             //lba_tagName.Content = data.TagName;
             args.Handled = true;
         }
@@ -361,7 +359,7 @@ namespace br.corp.bonus630.DrawUIExplorer
                 MenuItemData menuItem = new MenuItemData();
                 menuItem.Data = treeViewItemData.Data;
                 menuItem.Header = "Copy Guid";
-                menuItem.Icon = new System.Windows.Controls.Image() { Source = core.CopyMenuItemImg };
+                menuItem.Icon = new System.Windows.Controls.Image() { Source = dataContext.CopyMenuItemImg };
                 menuItem.Click += MenuCopyGuid_Click;
                 contextMenu.Items.Add(menuItem);
 
@@ -404,7 +402,7 @@ namespace br.corp.bonus630.DrawUIExplorer
             menuItem4.Click += MenuItemXmlEncode_Click;
             contextMenu.Items.Add(menuItem4);
 
-            if (!core.InCorel)
+            if (!dataContext.InCorel)
                 return contextMenu;
 
 
@@ -419,7 +417,7 @@ namespace br.corp.bonus630.DrawUIExplorer
             menuItem6.Data = treeViewItemData.Data;
             menuItem6.Header = "Try highlight this";
             menuItem6.Click += MenuItemTryHighlight_Click;
-            menuItem6.Icon = new System.Windows.Controls.Image() { Source = core.HighLightButtonImg };
+            menuItem6.Icon = new System.Windows.Controls.Image() { Source = dataContext.HighLightButtonImg };
             contextMenu.Items.Add(menuItem6);
 
             if (treeViewItemData.Data.GetType() == typeof(DataClass.CommandBarData))
@@ -715,13 +713,13 @@ namespace br.corp.bonus630.DrawUIExplorer
 
         private void btn_expandConsole_Click(object sender, RoutedEventArgs e)
         {
-            core.ConsoleExpanded = !core.ConsoleExpanded;
+            dataContext.ConsoleExpanded = !dataContext.ConsoleExpanded;
         }
 
         private void tabControl_Details_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (!core.ConsoleExpanded)
-                core.ConsoleExpanded = true;
+            if (!dataContext.ConsoleExpanded)
+                dataContext.ConsoleExpanded = true;
         }
 
         private void btn_clearConsole_Click(object sender, RoutedEventArgs e)
@@ -748,7 +746,7 @@ namespace br.corp.bonus630.DrawUIExplorer
         {
             try
             {
-                details.showHighLightItem();
+                core.CorelAutomation.showHighLightItem(this,core.Route);
             }
             catch (System.Exception erro)
             {
@@ -759,7 +757,7 @@ namespace br.corp.bonus630.DrawUIExplorer
         private void btn_getActiveGuid_Click(object sender, RoutedEventArgs e)
         {
             
-            details.copyItemCaptionAndGuid();
+           // core.CopyItemCaptionAndGuid();
         }
 
         private void btn_config_Click(object sender, RoutedEventArgs e)

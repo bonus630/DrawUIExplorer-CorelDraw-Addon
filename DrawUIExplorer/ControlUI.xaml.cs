@@ -13,7 +13,7 @@ namespace br.corp.bonus630.DrawUIExplorer
     public partial class ControlUI : UserControl
     {
         private corel.Application corelApp = null;
-        XMLTagWindow xMLTagsForm;
+        Views.XMLTagWindow xMLTagsForm;
         public static IntPtr corelHandle;
         
         private string currentTheme;
@@ -59,7 +59,7 @@ namespace br.corp.bonus630.DrawUIExplorer
         static extern IntPtr GetFocus();
         private void CallXMLForm(string filePath)
         {
-            xMLTagsForm = new XMLTagWindow(this.corelApp, filePath);
+            xMLTagsForm = new Views.XMLTagWindow(this.corelApp, filePath);
             xMLTagsForm.Closed += (s, e) => { xMLTagsForm = null; };
             IntPtr ownerWindowHandler = GetFocus();
             ControlUI.corelHandle = ownerWindowHandler;

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using br.corp.bonus630.DrawUIExplorer.DataClass;
 
-namespace br.corp.bonus630.DrawUIExplorer
+namespace br.corp.bonus630.DrawUIExplorer.Models
 {
     public class XMLDecoder
     {

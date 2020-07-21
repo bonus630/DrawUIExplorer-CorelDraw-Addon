@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 using br.corp.bonus630.DrawUIExplorer;
 using System.IO.Packaging;
 using System.Diagnostics;
+using br.corp.bonus630.DrawUIExplorer.Views;
 
 namespace Standalone
 {

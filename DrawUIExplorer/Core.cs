@@ -1,24 +1,19 @@
-﻿using System;
+﻿using br.corp.bonus630.DrawUIExplorer.DataClass;
+using br.corp.bonus630.DrawUIExplorer.Models;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
-using System.IO;
-using System.Diagnostics;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
 using System.Reflection;
-using br.corp.bonus630.DrawUIExplorer.DataClass;
+using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Media;
-using System.Runtime.CompilerServices;
-using System.ComponentModel;
-using System.Windows.Media.Imaging;
-using System.Windows.Input;
 
 namespace br.corp.bonus630.DrawUIExplorer
 {
-    public class Core : INotifyPropertyChanged
+    public class Core 
     {
         XMLDecoder xmlDecoder;
         WorkspaceUnzip workspaceUnzip;
@@ -33,9 +28,18 @@ namespace br.corp.bonus630.DrawUIExplorer
         public event Action<List<object>> GenericSearchResultEvent;
         public event Action<string, MsgType> NewMessage;
         public event PropertyChangedEventHandler PropertyChanged;
+        public event Action<IBasicData> CurrentBasicDataChanged;
 
         public IBasicData ListPrimaryItens { get; set; }
-        public IBasicData CurrentBasicData { get { return this.currentData; } set { this.currentData = value; NotifyPropertyChanged(); } }
+        public IBasicData CurrentBasicData
+        {
+            get { return this.currentData; }
+            set
+            {
+                this.currentData = value;
+                if (CurrentBasicDataChanged != null) CurrentBasicDataChanged(this.currentData);
+            }
+        }
         public SearchEngine SearchEngineGet { get { return this.searchEngine; } }
         public SearchEngine searchEngine;
         private MethodInfo[] commands;
@@ -48,11 +52,38 @@ namespace br.corp.bonus630.DrawUIExplorer
         {
             get { return app; }
         }
+        public bool InCorel { get; private set; }
+        public string Title { get; private set; }
+        public CorelAutomation CorelAutomation { get; private set; }
+        public List<IBasicData> Route { get { return getRoute(); } }
+        private List<IBasicData> getRoute()
+        {
+            List<IBasicData> temp = new List<IBasicData>();
+            temp.Add(CurrentBasicData);
+            iRoute(temp);
+            temp.Reverse();
+            return temp;
+        }
+        private void iRoute(List<IBasicData> c)
+        {
+            try
+            {
+                IBasicData basicData = c[c.Count - 1];
+                if (basicData != null && basicData.Parent !=null )
+                {
+
+                    c.Add(basicData.Parent);
+                    iRoute(c);
+                }
+            }
+            catch { }
+        }
         public void StartCore(string filePath, Corel.Interop.VGCore.Application corelApp)
         {
             if (corelApp != null)
             {
                 InCorel = true;
+                CorelAutomation = new CorelAutomation(corelApp, this);
                 this.app = corelApp;
                 corelApp.OnApplicationEvent += CorelApp_OnApplicationEvent;
             }
@@ -91,19 +122,10 @@ namespace br.corp.bonus630.DrawUIExplorer
             Thread thread = new Thread(new ParameterizedThreadStart(LoadFile));
             thread.IsBackground = true;
             thread.Start(file);
-            autoCompleteInputCommand();
-            
+
+
         }
-        private void autoCompleteInputCommand()
-        {
-            AutoCompleteSource = new System.Windows.Forms.AutoCompleteStringCollection();
-            MethodInfo[] m = (typeof(InputCommands)).GetMethods(BindingFlags.Public | BindingFlags.Instance);
-            for (int i = 0; i < m.Length; i++)
-            {
-                AutoCompleteSource.Add(m[i].Name);
-            }
-           
-        }
+
         private void CorelApp_OnApplicationEvent(string EventName, ref object[] Parameters)
         {
             string eventName = EventName;
@@ -156,11 +178,11 @@ namespace br.corp.bonus630.DrawUIExplorer
                 }
                 return result;
             }
-            catch(Exception err)
+            catch (Exception err)
             {
                 return err.Message;
             }
-            
+
         }
 
         private void XmlDecoder_LoadFinish()
@@ -357,66 +379,12 @@ namespace br.corp.bonus630.DrawUIExplorer
                 return FindParentControl<T>(parent);
             }
         }
-        #region bindings properties
-        private bool incorel = false;
-
-        public bool InCorel
-        {
-            get { return incorel; }
-            set
-            {
-                incorel = value;
-                NotifyPropertyChanged();
-            }
-        }
-        private string title;
-
-        public string Title
-        {
-            get { return title; }
-            set
-            {
-                title = value;
-                NotifyPropertyChanged();
-            }
-        }
-        private bool consoleExpanded;
-
-        public bool ConsoleExpanded
-        {
-            get { return consoleExpanded; }
-            set
-            {
-                consoleExpanded = value;
-                NotifyPropertyChanged();
-            }
-        }
-        System.Windows.Forms.AutoCompleteStringCollection AutoCompleteSource { get; set; }
-        public ViewModel.Commands.AttributeCommand RunBindCommand {get;set;}
-        public ViewModel.Commands.AttributeCommand RunMacroCommand { get; set; }
-        public ViewModel.Commands.AttributeCommand SearchGuidCommand { get; set; }
-        public ViewModel.Commands.AttributeCommand CopyCommand { get; set; }
-        public BitmapSource HighLightButtonImg {get{ return Properties.Resources.light.GetBitmapSource(); } }
-        public BitmapSource ActiveGuidButtonImg { get { return Properties.Resources.copy.GetBitmapSource(); } }
-        public BitmapSource ClearConsoleButtonImg { get { return Properties.Resources.trash.GetBitmapSource(); } }
-        public BitmapSource CopyMenuItemImg { get { return Properties.Resources.copy.GetBitmapSource(); } }
-        public BitmapSource PasteMenuItemImg { get { return Properties.Resources.paste.GetBitmapSource(); } }
-        public BitmapSource SearchButtonImg { get { return Properties.Resources.search.GetBitmapSource(); } }
-        public BitmapSource ConfigButtonImg { get { return Properties.Resources.setting.GetBitmapSource(); } }
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-        #endregion
-      
     }
+
     public enum MsgType
     {
         Console,
         Event
     }
-    
+
 }

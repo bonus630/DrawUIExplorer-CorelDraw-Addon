@@ -195,32 +195,41 @@
     <Compile Include="Controls\InputCommandsView.xaml.cs">
       <DependentUpon>InputCommandsView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\InvertBoolVisibilityConverter.cs" />
     <Compile Include="Core.cs" />
-    <Compile Include="CorelAutomation.cs" />
-    <Compile Include="Details.xaml.cs">
+    <Compile Include="Models\CorelAutomation.cs" />
+    <Compile Include="ViewModels\Commands\SimpleCommand.cs" />
+    <Compile Include="ViewModels\SearchAdvancedParamsViewModel.cs" />
+    <Compile Include="Views\Details.xaml.cs">
       <DependentUpon>Details.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ExtensionsMethods.cs" />
-    <Compile Include="InputCommands.cs" />
+    <Compile Include="Models\ExtensionsMethods.cs" />
+    <Compile Include="Models\InputCommands.cs" />
     <Compile Include="OverlayForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="OverlayForm.Designer.cs">
       <DependentUpon>OverlayForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Search.xaml.cs">
+    <Compile Include="Views\Search.xaml.cs">
       <DependentUpon>Search.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SearchEngine.cs" />
-    <Compile Include="ViewModel\Commands\AttributeCommand.cs" />
-    <Compile Include="WinAPI.cs" />
-    <Compile Include="WorkspaceUnzip.cs" />
-    <Compile Include="XMLDecoder.cs" />
-    <Compile Include="XMLEncoder.cs" />
-    <Compile Include="XMLTagWindow.xaml.cs">
+    <Compile Include="Models\SearchEngine.cs" />
+    <Compile Include="ViewModels\Commands\AttributeCommand.cs" />
+    <Compile Include="ViewModels\Commands\RoutedCommand.cs" />
+    <Compile Include="ViewModels\DetailsViewModel.cs" />
+    <Compile Include="ViewModels\SearchViewModel.cs" />
+    <Compile Include="ViewModels\ViewModelBase.cs" />
+    <Compile Include="ViewModels\XMLTagWindowViewModel.cs" />
+    <Compile Include="ViewModels\XSLTesterViewModel.cs" />
+    <Compile Include="Models\WinAPI.cs" />
+    <Compile Include="Models\WorkspaceUnzip.cs" />
+    <Compile Include="Models\XMLDecoder.cs" />
+    <Compile Include="Models\XMLEncoder.cs" />
+    <Compile Include="Views\XMLTagWindow.xaml.cs">
       <DependentUpon>XMLTagWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="XSLTEster.xaml.cs">
+    <Compile Include="Views\XSLTEster.xaml.cs">
       <DependentUpon>XSLTEster.xaml</DependentUpon>
     </Compile>
     <Page Include="Controls\Config.xaml">
@@ -272,22 +281,22 @@
     <Compile Include="DataClass\UIConfig.cs" />
     <Compile Include="DataClass\UserData.cs" />
     <Compile Include="DataClass\ViewData.cs" />
-    <Compile Include="MessageBox.cs">
+    <Compile Include="Models\MessageBox.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Details.xaml">
+    <Page Include="Views\Details.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Search.xaml">
+    <Page Include="Views\Search.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="XMLTagWindow.xaml">
+    <Page Include="Views\XMLTagWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="XSLTEster.xaml">
+    <Page Include="Views\XSLTEster.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -359,6 +368,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
