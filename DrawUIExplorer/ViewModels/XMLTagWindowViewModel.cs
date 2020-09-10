@@ -1,11 +1,12 @@
 ﻿using br.corp.bonus630.DrawUIExplorer.DataClass;
 using br.corp.bonus630.DrawUIExplorer.Models;
+using br.corp.bonus630.DrawUIExplorer.ViewModels.Commands;
 using System.Reflection;
 using System.Windows.Media.Imaging;
 
 namespace br.corp.bonus630.DrawUIExplorer.ViewModels
 {
-    class XMLTagWindowViewModel : ViewModelBase
+    class XMLTagWindowViewModel : ViewModelDataBase
     {
         private bool incorel = false;
 
@@ -40,14 +41,21 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
                 NotifyPropertyChanged();
             }
         }
-        public BitmapSource CopyMenuItemImg { get { return Properties.Resources.copy.GetBitmapSource(); } }
+        
         public BitmapSource HighLightButtonImg { get { return Properties.Resources.light.GetBitmapSource(); } }
         System.Windows.Forms.AutoCompleteStringCollection AutoCompleteSource { get; set; }
+
+        //public SimpleCommand configCommand, clearConsoleCommmand, expandConsoleCommand, highLightCommand, activeGuidCommand;
+
+        public SimpleCommand ConfigCommand { get { return new SimpleCommand(config); } }
+        public SimpleCommand ExpandConsoleCommand { get { return new SimpleCommand(expandConsole); } }
+        public SimpleCommand ActiveGuidCommand { get { return new SimpleCommand(activeGuid); } }
+        public SimpleCommand HighLightCommand { get { return new SimpleCommand(showHighLightItem); } }
+
         public XMLTagWindowViewModel(Core core):base(core)
         {
             autoCompleteInputCommand();
-            
-
+          
         }
         protected override void Update(IBasicData basicData)
         {
@@ -62,6 +70,26 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
                 AutoCompleteSource.Add(m[i].Name);
             }
 
+        }
+     
+
+        private void showHighLightItem()
+        {
+            core.CorelAutomation.ShowHighLightItem(core.Route);
+        }
+        private void activeGuid()
+        {
+             //core.CopyItemCaptionAndGuid();
+        }
+
+        private void config()
+        {
+            Views.Config config = new Views.Config();
+            config.ShowDialog();
+        }
+        private void expandConsole()
+        {
+            this.ConsoleExpanded = !this.ConsoleExpanded;
         }
     }
 }

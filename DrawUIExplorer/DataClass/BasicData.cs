@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace br.corp.bonus630.DrawUIExplorer.DataClass
 {
-    public class BasicData<T> : IComparable, IBasicData 
+    public abstract class BasicData<T> : IComparable, IBasicData 
     {
         public string Guid { get; set; }
         public string GuidRef { get; set; }

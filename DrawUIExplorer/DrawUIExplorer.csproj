@@ -189,7 +189,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\Config.xaml.cs">
+    <Compile Include="DataClass\SearchData.cs" />
+    <Compile Include="Models\SaveLoadConfig.cs" />
+    <Compile Include="ViewModels\ConfigViewModel.cs" />
+    <Compile Include="ViewModels\ViewModelDataBase.cs" />
+    <Compile Include="Views\Config.xaml.cs">
       <DependentUpon>Config.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\InputCommandsView.xaml.cs">
@@ -232,7 +236,7 @@
     <Compile Include="Views\XSLTEster.xaml.cs">
       <DependentUpon>XSLTEster.xaml</DependentUpon>
     </Compile>
-    <Page Include="Controls\Config.xaml">
+    <Page Include="Views\Config.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -336,6 +340,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="app.config" />
     <None Include="Design\projectGuides.guides" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

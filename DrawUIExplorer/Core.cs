@@ -19,6 +19,7 @@ namespace br.corp.bonus630.DrawUIExplorer
         WorkspaceUnzip workspaceUnzip;
 
         public event Action<string> LoadXmlFinish;
+        public event Action<bool> RequestUIHideVisibleChanged;
         public event Action LoadListsFinish;
         public event Action<bool, string> LoadStarting;
         public event Action<string> LoadFinish;
@@ -41,7 +42,7 @@ namespace br.corp.bonus630.DrawUIExplorer
             }
         }
         public SearchEngine SearchEngineGet { get { return this.searchEngine; } }
-        public SearchEngine searchEngine;
+        private SearchEngine searchEngine;
         private MethodInfo[] commands;
         public MethodInfo[] Commands { get { return commands; } }
         private InputCommands inputCommands;
@@ -56,6 +57,7 @@ namespace br.corp.bonus630.DrawUIExplorer
         public string Title { get; private set; }
         public CorelAutomation CorelAutomation { get; private set; }
         public List<IBasicData> Route { get { return getRoute(); } }
+        public bool SetUIVisible { set { if (RequestUIHideVisibleChanged != null) RequestUIHideVisibleChanged(value); } }
         private List<IBasicData> getRoute()
         {
             List<IBasicData> temp = new List<IBasicData>();
@@ -128,13 +130,19 @@ namespace br.corp.bonus630.DrawUIExplorer
 
         private void CorelApp_OnApplicationEvent(string EventName, ref object[] Parameters)
         {
-            string eventName = EventName;
-            for (int i = 0; i < Parameters.Length; i++)
+            try
             {
-                EventName += " Param" + i + "|Type:" + Parameters[i].GetType() + "Value:" + Parameters[i].ToString();
+                string eventName = EventName;
+                for (int i = 0; i < Parameters.Length; i++)
+                {
+                    EventName += " Param" + i + "|Type:" + Parameters[i].GetType() + "Value:" + Parameters[i].ToString();
+                }
+                DispactchNewMessage(eventName, MsgType.Event);
             }
-
-            DispactchNewMessage(eventName, MsgType.Event);
+            catch(Exception erro)
+            {
+                DispactchNewMessage(erro.Message, MsgType.Console);
+            }
         }
         public string RunCommand(string commandName)
         {
@@ -144,7 +152,7 @@ namespace br.corp.bonus630.DrawUIExplorer
                 string[] pierces = commandName.Split(" ".ToCharArray());
                 int j = 0;
                 List<object> param = new List<object>();
-                while (string.IsNullOrEmpty(pierces[j]) || pierces[j] == " ")
+                while (!string.IsNullOrEmpty(pierces[j]) || pierces[j] == " ")
                 {
                     if (!string.IsNullOrEmpty(pierces[j]) && pierces[j] != " ")
                     {
@@ -156,21 +164,14 @@ namespace br.corp.bonus630.DrawUIExplorer
                     if (j >= pierces.Length)
                         break;
                 }
-
-                while (string.IsNullOrEmpty(pierces[j]) || pierces[j] == " ")
+                while (j < pierces.Length && (!string.IsNullOrEmpty(pierces[j]) || pierces[j] == " "))
                 {
                     if (!string.IsNullOrEmpty(pierces[j]) && pierces[j] != " ")
                     {
                         param.Add(pierces[j]);
-
                     }
                     j++;
-                    if (j >= pierces.Length)
-                        break;
                 }
-
-
-
                 for (int i = 0; i < commands.Length; i++)
                 {
                     if (commands[i].Name == commandName)
@@ -211,6 +212,10 @@ namespace br.corp.bonus630.DrawUIExplorer
         {
 
             return searchEngine.SearchItemFromGuidRef(list, guid);
+        }
+        public IBasicData SearchItemContainsGuidRef(string guid)
+        {
+            return searchEngine.SearchItemContainsGuidRef(this.ListPrimaryItens, guid);
         }
         public IBasicData SearchItemContainsGuidRef(IBasicData list, string guid)
         {

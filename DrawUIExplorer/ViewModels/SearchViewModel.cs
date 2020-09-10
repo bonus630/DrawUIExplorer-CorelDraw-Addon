@@ -10,33 +10,48 @@ using System.Windows;
 
 namespace br.corp.bonus630.DrawUIExplorer.ViewModels
 {
-    public class SearchViewModel : ViewModelBase
+    public class SearchViewModel : ViewModelDataBase
     {
         private SearchEngine searchEngine;
        
         private ObservableCollection<SearchAdvancedParamsViewModel> advancedSearchListAction = new ObservableCollection<SearchAdvancedParamsViewModel>();
         public ObservableCollection<SearchAdvancedParamsViewModel> AdvancedSearchListAction { get { return advancedSearchListAction; } set { this.advancedSearchListAction = value;NotifyPropertyChanged();  } }
 
-        private List<object> tags;
+        private ObservableCollection<object> tags = new ObservableCollection<object>();
 
-        public List<object> Tags
+        public ObservableCollection<object> Tags
         {
             get { return tags; }
-            set { tags = value;NotifyPropertyChanged(); }
+            set {
+             
+                NotifyPropertyChanged(); }
         }
-        private List<object> attributesName;
+        private ObservableCollection<object> attributesName = new ObservableCollection<object>();;
 
-        public List<object> AttributesName
+        public ObservableCollection<object> AttributesName
         {
             get { return attributesName; }
-            set { attributesName = value; NotifyPropertyChanged(); }
+            set {
+                //if (attributesName != null)
+                //    attributesName.Clear();
+                //attributesName = value;
+                //if (attributesName.Count > 0)
+                //    AttributeName = attributesName[0].ToString(); 
+                NotifyPropertyChanged(); }
         }
-        private List<object> attributesValue;
+        private ObservableCollection<object> attributesValue = new ObservableCollection<object>();;
 
-        public List<object> AttributesValue
+        public ObservableCollection<object> AttributesValue
         {
             get { return attributesValue; }
-            set { attributesValue = value; NotifyPropertyChanged(); }
+            set {
+                //if (attributesValue != null)
+                //    attributesValue.Clear();
+                //attributesValue = value;
+                //if (attributesValue.Count > 0)
+                //    AttributeValue = attributesValue[0].ToString();
+                NotifyPropertyChanged();
+            }
         }
 
         public RoutedCommand<IBasicData> Search { get {return new RoutedCommand<IBasicData>(search); } }
@@ -46,7 +61,9 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
         public RoutedCommand<bool> SetGlobalData { get { return new RoutedCommand<bool>(setGlocalData); } }
         public SimpleCommand CopyGuid { get { return new SimpleCommand(menuItemCopyGuid); } }
         public SimpleCommand PastGuid { get { return new SimpleCommand(menuItemPastGuid); } }
+        public SimpleCommand ClearSearchs { get { return new SimpleCommand(clearSearchs); } }
         public RoutedCommand<bool> SetAttributeTag { get { return new RoutedCommand<bool>(setAttributeTag); } }
+       
 
         protected IBasicData sBasicData;
         public IBasicData SearchBasicData
@@ -214,24 +231,35 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
             switch (tag)
             {
                 case "TagName":
-                        Tags  = searchEngine.SearchAllTags(this.CurrentBasicData);
+                        Tags  = setCollection(tags,searchEngine.SearchAllTags(this.CurrentBasicData));
                     break;
                 case "AttributeName":
-                        AttributesName = searchEngine.SearchAllAttributesName(this.CurrentBasicData, SearchOrderResult.ASC);
+                        AttributesName = setCollection(attributesName,searchEngine.SearchAllAttributesName(this.CurrentBasicData, SearchOrderResult.ASC));
                     break;
                 case "AttributeValue":
-                        AttributesValue = searchEngine.SearchAllAttributesValue(this.CurrentBasicData, SearchOrderResult.ASC);
+                        AttributesValue = setCollection(attributesValue,searchEngine.SearchAllAttributesValue(this.CurrentBasicData, SearchOrderResult.ASC));
                     break;
             }
 
         }
+        private ObservableCollection<object> setCollection(ObservableCollection<object> collection, List<object> itens)
 
+        {
+            for (int i = 0; i < itens.Count; i++)
+            {
+                if(!collection.Contains(itens[i]))
+                {
+                    collection.Add(itens[i]);
+                }
+            }
+            return collection;
+        }
         private string attributeValueTag;
 
         public string AttributeValueTag
         {
             get { return attributeValueTag; }
-            set { attributeValueTag = value; }
+            set { attributeValueTag = value; NotifyPropertyChanged(); }
         }
 
 
@@ -260,7 +288,9 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
         public string Guid
         {
             get { return guid; }
-            set { guid = value; }
+            set { guid = value;
+                NotifyPropertyChanged();
+            }
         }
         private bool localData = true;
 
@@ -272,6 +302,10 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
         private void menuItemPastGuid()
         {
             Guid = GetGuid(Clipboard.GetText());
+        }
+        private void clearSearchs()
+        {
+
         }
         private void setLocalData(bool s)
         {

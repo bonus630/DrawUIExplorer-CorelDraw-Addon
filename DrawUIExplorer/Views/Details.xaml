@@ -108,7 +108,11 @@
                         />-->
                         <MenuItem Header="Copy" Background="WhiteSmoke" 
                                   CommandParameter="{Binding}" Command="{Binding Path=DataContext.CopyCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" 
-                                  />
+                                  >
+                            <MenuItem.Icon>
+                                <Image Source="{Binding CopyMenuItemImg}" />
+                            </MenuItem.Icon>
+                        </MenuItem>
                         <MenuItem Header="Search Guid" Background="WhiteSmoke" 
                                   CommandParameter="{Binding}" Command="{Binding Path=DataContext.SearchGuidCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" 
                                   

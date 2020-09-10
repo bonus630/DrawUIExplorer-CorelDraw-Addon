@@ -3,10 +3,11 @@ using br.corp.bonus630.DrawUIExplorer.DataClass;
 using br.corp.bonus630.DrawUIExplorer.Models;
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace br.corp.bonus630.DrawUIExplorer.ViewModels
 {
-    public class DetailsViewModel : ViewModelBase
+    public class DetailsViewModel : ViewModelDataBase
     {
         Core core;
         List<IBasicData> temp;
@@ -26,6 +27,7 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
         public Commands.AttributeCommand RunMacroCommand { get; set; }
         public Commands.AttributeCommand SearchGuidCommand { get; set; }
         public Commands.AttributeCommand CopyCommand { get; set; }
+        
 
         private string caption;
 

@@ -33,12 +33,12 @@
                     <TextBox Name="txt_guid" Text="{Binding Guid}" Margin="5,4,0,0" Height="22" VerticalAlignment="Top" HorizontalAlignment="Left" Width="350" >
                         <TextBox.ContextMenu>
                             <ContextMenu>
-                                <MenuItem Header="Copy Guid" Name="menuItemCopyGuid"  CommandParameter="{Binding Guid}" Command="{Binding CopyGuid}" >
+                                <MenuItem Header="Copy Guid" Name="menuItemCopyGuid" CommandParameter="{Binding Guid}" Command="{Binding CopyGuid}" >
                                     <MenuItem.Icon>
                                         <Image Source="{Binding CopyMenuItemImg}" />
                                     </MenuItem.Icon>
                                 </MenuItem>
-                                <MenuItem Header="Paste Guid" Name="menuItemPastGuid"   CommandParameter="{Binding Guid}" Command="{Binding PastGuid}">
+                                <MenuItem Header="Paste Guid" Name="menuItemPastGuid" CommandParameter="{Binding Guid}" Command="{Binding PastGuid}">
                                     <MenuItem.Icon>
                                         <Image Source="{Binding PasteMenuItemImg}" />
                                     </MenuItem.Icon>
@@ -73,8 +73,10 @@
             <GroupBox Header="Attribute Value" Margin="0,158,0,0" Height="74" VerticalAlignment="Top" HorizontalAlignment="Left" Width="400">
                 <StackPanel Height="52" VerticalAlignment="Top">
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0" Height="19">
-                        <RadioButton Content="Equals" Width="80" IsChecked="True" x:Name="rb_att_equals"  Style="{DynamicResource RadioButtonStyle}" Margin="0,-3.335,0,3.335"/>
-                        <RadioButton Content="Like" Width="80" Margin="8,-3.335,0,3.335" x:Name="rb_att_like"  Style="{DynamicResource RadioButtonStyle}"/>
+                        <RadioButton Content="Equals" Width="80" IsChecked="True" x:Name="rb_att_equals"  Style="{DynamicResource RadioButtonStyle}" Margin="0,-3.335,0,3.335"
+                                     CommandParameter="{Binding ElementName=rb_att_like,Path=IsChecked}" Command="{Binding SetAttributeTag}"/>
+                        <RadioButton Content="Like" Width="80" Margin="8,-3.335,0,3.335" x:Name="rb_att_like" Style="{DynamicResource RadioButtonStyle}"
+                                     CommandParameter="{Binding RelativeSource={RelativeSource Self},Path=IsChecked}" Command="{Binding SetAttributeTag}"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Height="22">
                         <CheckBox Content="Only" x:Name="cb_uniqueValue" IsChecked="{Binding UniqueValue}" VerticalAlignment="Center" HorizontalAlignment="Left" Style="{DynamicResource CheckBoxStyle}"/>

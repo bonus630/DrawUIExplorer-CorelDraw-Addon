@@ -11,7 +11,7 @@ using System.Xml.Xsl;
 
 namespace br.corp.bonus630.DrawUIExplorer.ViewModels
 {
-    class XSLTesterViewModel : ViewModelBase
+    class XSLTesterViewModel : ViewModelDataBase
     {
         XmlDocument xmlDoc;
         XslCompiledTransform xslCompiledTransform;
@@ -44,8 +44,8 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
             set { resultText = value; NotifyPropertyChanged(); }
         }
 
-        public SimpleCommand GenXml { get { return new SimpleCommand(GenXmlText); } }
-        public SimpleCommand Process { get { return new SimpleCommand(process); } }
+        public SimpleCommand GenXmlCommand { get { return new SimpleCommand(GenXmlText); } }
+        public SimpleCommand ProcessCommand { get { return new SimpleCommand(process); } }
 
         public XSLTesterViewModel(Core core):base(core)
         {

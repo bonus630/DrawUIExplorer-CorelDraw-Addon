@@ -12,7 +12,7 @@ using System.Windows.Controls;
 
 namespace br.corp.bonus630.DrawUIExplorer.ViewModels
 {
-    public class SearchAdvancedParamsViewModel : System.Windows.Data.IValueConverter, INotifyPropertyChanged
+    public class SearchAdvancedParamsViewModel : ViewModelBase, System.Windows.Data.IValueConverter
     {
         private Action<IBasicData, string, bool> searchAction;
 
@@ -53,7 +53,7 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
         }
         private bool enable = true;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        
 
         public bool Enable
         {
@@ -110,13 +110,7 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
                 return true;
             return false;
         }
-        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
+     
 
       
     }

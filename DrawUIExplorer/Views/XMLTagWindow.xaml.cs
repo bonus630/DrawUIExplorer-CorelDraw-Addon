@@ -25,6 +25,7 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
         bool cancelTreeGeneration = false;
         Thread th = null;
         XMLTagWindowViewModel dataContext;
+        SaveLoadConfig saveLoad;
         //public static bool inCorel = true;
         private Corel.Interop.VGCore.Application app;
 
@@ -66,11 +67,26 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
             core.SearchResultEvent += Core_SearchResultEvent;
             core.LoadFinish += Core_LoadFinish1;
             core.NewMessage += Core_NewMessage;
+            core.RequestUIHideVisibleChanged += Core_RequestUIHideVisibleChanged;
             dataContext.InCorel = core.InCorel;
             treeView_Nodes.GotFocus += (s, e) => { if (treeView_Nodes.SelectedItem != null) UpdateDetails(treeView_Nodes.SelectedItem, e); };
             treeView_Ref.GotFocus += (s, e) => { if (treeView_Ref.SelectedItem != null) UpdateDetails(treeView_Ref.SelectedItem, e); };
             treeView_Search.GotFocus += (s, e) => { if (treeView_Search.SelectedItem != null) UpdateDetails(treeView_Search.SelectedItem, e); };
             inputControl.Core = core;
+            saveLoad = new SaveLoadConfig();
+        }
+
+        private void Core_RequestUIHideVisibleChanged(bool obj)
+        {
+            this.Dispatcher.Invoke(new Action(() =>
+            {
+                if (obj)
+                    this.Visibility = Visibility.Visible;
+                else
+                    this.Visibility = Visibility.Hidden;
+            }
+            ));
+       
         }
 
         private void Core_LoadFinish1(string msg)
@@ -80,7 +96,8 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
 
         private void Core_SearchResultEvent(IBasicData obj)
         {
-            treeView_Search.Items.Clear();
+            //Vou testar para salvar as pesquisar
+           // treeView_Search.Items.Clear();
             gridRef.Visibility = Visibility.Visible;
             InflateTreeView(obj, treeView_Search);
         }
@@ -152,8 +169,13 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
                     switch (msgType)
                     {
                         case MsgType.Console:
-                            txt_console.Text = (string.Format("{0}. {1}\r\n", msgCount, msg));
-                            txt_consoleFull.AppendText(string.Format("{0}. {1}\r\n", msgCount, msg));
+                            string s = "";
+                            if(saveLoad.ConsoleCounter)
+                                s = (string.Format("{0}. {1}\r\n", msgCount, msg));
+                            else
+                               s = (string.Format("{0}\r\n", msg));
+                            txt_console.Text = s;
+                            txt_consoleFull.AppendText(s);
                             try
                             {
                                 txt_consoleFull.ScrollToLine(txt_consoleFull.LineCount - 1);
@@ -495,9 +517,27 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
                 menuItem.Click += MenuItemGetDockerCaption_Click;
                 contextMenu.Items.Add(menuItem);
             }
+            if (treeViewItemData.Data.GetType() == typeof(DataClass.SearchData))
+            {
+                MenuItemData menuItem = new MenuItemData();
+                menuItem.Data = treeViewItemData.Data;
+                menuItem.Header = "Remove me";
+                menuItem.Click += MenuItemRemoveMe_Click;
+                contextMenu.Items.Add(menuItem);
+            }
 
 
             return contextMenu;
+        }
+
+        private void MenuItemRemoveMe_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem MenuData = (sender as MenuItem);
+            DependencyObject parent = Core.FindParentControl<TreeViewItem>(MenuData);
+            if (parent == null)
+                return;
+            TreeViewItem p = parent as TreeViewItem;
+            treeView_Search.Items.Remove(p);
         }
         #region ContextMenu Items Click Events
         private void MenuItemFindGenericRef_Click(object sender, RoutedEventArgs e)
@@ -544,13 +584,7 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
 
         private void MenuItemInvoke_Click(object sender, RoutedEventArgs e)
         {
-            string guid;
-            IBasicData basicData = (sender as MenuItemData).Data;
-            if (!string.IsNullOrEmpty(basicData.Guid))
-                guid = basicData.Guid;
-            else
-                guid = basicData.GuidRef;
-            this.app.FrameWork.Automation.InvokeItem(guid);
+            corelCmd.InvokeItem((sender as MenuItemData).Data);
         }
         private void MenuItemXmlEncode_Click(object sender, RoutedEventArgs e)
         {
@@ -592,30 +626,21 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
         }
         private void MenuItemshowDialog_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-#if !X7
-                this.app.FrameWork.ShowDialog((sender as MenuItemData).Data.Guid);
-#endif
-            }
-            catch (Exception erro)
-            {
-                SetProgressBar(false, false, erro.Message);
-            }
+               corelCmd.ShowDialog((sender as MenuItemData).Data.Guid);
         }
         private void MenuItemHideDialog_Click(object sender, RoutedEventArgs e)
         {
 #if !X7
-            this.app.FrameWork.HideDialog((sender as MenuItemData).Data.Guid);
+            corelCmd.HideDialog((sender as MenuItemData).Data.Guid);
 #endif
         }
         private void MenuItemshowDocker_Click(object sender, RoutedEventArgs e)
         {
-            this.app.FrameWork.ShowDocker((sender as MenuItemData).Data.Guid);
+            corelCmd.ShowDocker((sender as MenuItemData).Data.Guid);
         }
         private void MenuItemHideDocker_Click(object sender, RoutedEventArgs e)
         {
-            this.app.FrameWork.HideDocker((sender as MenuItemData).Data.Guid);
+            corelCmd.HideDocker((sender as MenuItemData).Data.Guid);
         }
         private void MenuItemshowCommandBar_Click(object sender, RoutedEventArgs e)
         {
@@ -628,16 +653,15 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
         }
         private void MenuItemCommandBarMode_Click(object sender, RoutedEventArgs e)
         {
-            CommandBarMode(sender, false);
+            corelCmd.CommandBarMode((sender as MenuItemData).Data, false);
         }
         private void MenuItemshowItem_Click(object sender, RoutedEventArgs e)
         {
-            if (this.app != null)
-                this.app.FrameWork.Automation.ShowBar((sender as MenuItemData).Data.Guid);
+               corelCmd.ShowBar((sender as MenuItemData).Data.Guid);
         }
         private void MenuItemGetCaptionText_Click(object sender, RoutedEventArgs e)
         {
-            txt_console.Text = (this.app.FrameWork.Automation.GetCaptionText((sender as MenuItemData).Data.Guid) + "\r\n");
+            core.DispactchNewMessage(corelCmd.GetCaption((sender as IBasicData).Guid),MsgType.Console);
         }
         private void MenuItemTryHighlight_Click(object sender, RoutedEventArgs e)
         {
@@ -645,27 +669,15 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
         }
         private void showHideCommandBar(object sender, bool show = true)
         {
-            string commandBarCaption = "";
+           
             IBasicData basicData = (sender as MenuItemData).Data;
-            commandBarCaption = this.app.FrameWork.Automation.GetCaptionText(basicData.Guid);
-            if (string.IsNullOrEmpty(commandBarCaption))
-                commandBarCaption = core.TryGetAnyCaption(basicData);
-            corelCmd.ShowHideCommandBar(commandBarCaption, true);
+            corelCmd.ShowHideCommandBar(basicData, show);
         }
-        private void CommandBarMode(object sender, bool show = true)
-        {
-            string commandBarCaption = "";
-            IBasicData basicData = (sender as MenuItemData).Data;
-            commandBarCaption = this.app.FrameWork.Automation.GetCaptionText(basicData.Guid);
-            if (string.IsNullOrEmpty(commandBarCaption))
-                commandBarCaption = core.TryGetAnyCaption(basicData);
-            corelCmd.CommandBarMode(commandBarCaption, true);
-        }
+      
         private void MenuFindRef_Click(object sender, RoutedEventArgs e)
         {
             IBasicData basicData1 = (sender as MenuItemData).Data;
-            if (this.app != null)
-                basicData1.Caption = this.app.FrameWork.Automation.GetCaptionText(basicData1.Guid);
+             basicData1.Caption = corelCmd.GetCaption(basicData1.Guid);
             core.FindByGuid(core.ListPrimaryItens.Childrens, basicData1.GuidRef);
         }
         private void MenuCopyGuid_Click(object sender, RoutedEventArgs e)
@@ -711,24 +723,13 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
 
         }
 
-        private void btn_expandConsole_Click(object sender, RoutedEventArgs e)
-        {
-            dataContext.ConsoleExpanded = !dataContext.ConsoleExpanded;
-        }
-
-        private void tabControl_Details_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            if (!dataContext.ConsoleExpanded)
-                dataContext.ConsoleExpanded = true;
-        }
-
         private void btn_clearConsole_Click(object sender, RoutedEventArgs e)
         {
             int index = tabControl_Details.SelectedIndex;
             switch (index)
             {
                 case 0:
-                    //txt_inputCommand.Text = "";
+                    inputControl.Text = "";
                     break;
                 case 1:
                     txt_xmlViewer.Text = "";
@@ -741,12 +742,11 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
                     break;
             }
         }
-
         private void btn_showTreeView_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                core.CorelAutomation.showHighLightItem(this,core.Route);
+                core.CorelAutomation.ShowHighLightItem( core.Route);
             }
             catch (System.Exception erro)
             {
@@ -754,16 +754,12 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
             }
 
         }
-        private void btn_getActiveGuid_Click(object sender, RoutedEventArgs e)
+        private void tabControl_Details_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            
-           // core.CopyItemCaptionAndGuid();
+            if (!dataContext.ConsoleExpanded)
+                dataContext.ConsoleExpanded = true;
         }
 
-        private void btn_config_Click(object sender, RoutedEventArgs e)
-        {
-            Controls.Config config = new Controls.Config();
-            config.ShowDialog();
-        }
+        
     }
 }

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using win = System.Windows;
 using br.corp.bonus630.DrawUIExplorer.DataClass;
 using Corel.Interop.VGCore;
+using System.Threading;
 
 namespace br.corp.bonus630.DrawUIExplorer.Models
 {
@@ -26,7 +27,7 @@ namespace br.corp.bonus630.DrawUIExplorer.Models
             corelApp.FrameWork.HideDocker(guid);
             return caption;
         }
-      
+
         public string GetActiveMenuItemGuid(int index)
         {
 #if X7
@@ -52,6 +53,35 @@ namespace br.corp.bonus630.DrawUIExplorer.Models
             return new System.Windows.Rect() { X = left, Y = top, Width = width, Height = height };
 
         }
+        public string GetCaption(string guid)
+        {
+            try
+            {
+                return this.corelApp.FrameWork.Automation.GetCaptionText(guid);
+            }
+
+            catch (Exception e)
+            {
+                return e.Message;
+            }
+        }
+        public void InvokeItem(IBasicData basicData)
+        {
+            try
+            {
+                string guid;
+                if (!string.IsNullOrEmpty(basicData.Guid))
+                    guid = basicData.Guid;
+                else
+                    guid = basicData.GuidRef;
+                this.corelApp.FrameWork.Automation.InvokeItem(guid);
+            }
+            catch (Exception e)
+            {
+                core.DispactchNewMessage(e.Message, MsgType.Console);
+            }
+        }
+
 #if X9
         public string LoadLocalizedString(string guid)
         {
@@ -60,16 +90,24 @@ namespace br.corp.bonus630.DrawUIExplorer.Models
 
         }
 #endif
-        public void b()
+        //public void b()
+        //{
+        //    var a = corelApp.FrameWork.CommandBars[0].Controls[0].Parameter;
+        //}
+        public void ShowHideCommandBar(IBasicData basicData, bool show = true)
         {
-            var a = corelApp.FrameWork.CommandBars[0].Controls[0].Parameter;
+            string commandBarCaption = GetItemCaption(basicData);
+
+            this.ShowHideCommandBar(commandBarCaption, show);
         }
         public void ShowHideCommandBar(string commandBarName, bool show = true)
         {
+            //How close a commandBar in a popup
             try
             {
                 if (!string.IsNullOrEmpty(commandBarName))
                     this.corelApp.FrameWork.CommandBars[commandBarName].Visible = show;
+                
             }
             catch (Exception e)
             {
@@ -77,16 +115,37 @@ namespace br.corp.bonus630.DrawUIExplorer.Models
             }
 
         }
+        public void ShowBar(string guid)
+        {
+            try
+            {
+                this.corelApp.FrameWork.Automation.ShowBar(guid);
+            }
+            catch (Exception e)
+            {
+                core.DispactchNewMessage(e.Message, MsgType.Console);
+            }
+
+        }
+        public void CommandBarMode(IBasicData basicData, bool show = true)
+        {
+            string commandBarCaption = GetItemCaption(basicData);
+            this.CommandBarMode(commandBarCaption, true);
+        }
         public void CommandBarMode(string commandBarName, bool show = true)
         {
             try
             {
-                if (!string.IsNullOrEmpty(commandBarName)) {
+                if (!string.IsNullOrEmpty(commandBarName))
+                {
                     CommandBar commandBar = this.corelApp.FrameWork.CommandBars[commandBarName];
-                   // var ctr = this.app.FrameWork.Automation.GetControlData("");
-                  // commandBar.Controls.Count
-                   CommandBarModes modes = commandBar.Modes;
-                    core.DispactchNewMessage("CommandBarMode: "+commandBar.Controls.Count.ToString(), MsgType.Console);
+
+                    // var ctr = this.app.FrameWork.Automation.GetControlData("");
+                    // commandBar.Controls.Count
+                    CommandBarModes modes = commandBar.Modes;
+                    // string guid = corelApp.FrameWork.Automation.GetActiveMenuItemGuid(0);
+                    //corelApp.FrameWork.Automation.InvokeDialogItem(GuidDialog, guiditem);
+                    core.DispactchNewMessage("CommandBarMode: " + commandBar.Controls.Count.ToString(), MsgType.Console);
                 }
             }
             catch (Exception e)
@@ -96,13 +155,42 @@ namespace br.corp.bonus630.DrawUIExplorer.Models
         }
         public string GetItemCaption(string guid)
         {
-            string caption = "";
-            caption = this.corelApp.FrameWork.Automation.GetCaptionText(guid);
-            return caption;
-
-
+            try
+            {
+                string caption = "";
+                caption = this.corelApp.FrameWork.Automation.GetCaptionText(guid);
+                return caption;
+            }
+            catch (Exception e)
+            {
+                core.DispactchNewMessage(e.Message, MsgType.Console);
+            }
+            return "";
         }
-
+        public string GetItemCaption(IBasicData basicData)
+        {
+            try
+            {
+                string commandBarCaption = "";
+                commandBarCaption = this.corelApp.FrameWork.Automation.GetCaptionText(basicData.Guid);
+                if (string.IsNullOrEmpty(commandBarCaption))
+                    commandBarCaption = core.TryGetAnyCaption(basicData);
+                return commandBarCaption;
+            }
+            catch(Exception e)
+            {
+                core.DispactchNewMessage(e.Message, MsgType.Console);
+            }
+            return "";
+        }
+        public void InvokeItem(string itemGuid)
+        {
+            corelApp.FrameWork.Automation.InvokeItem(itemGuid);
+        }
+        public void InvokeDialogItem(string dialogGuid,string itemGuid)
+        {
+            corelApp.FrameWork.Automation.InvokeDialogItem(dialogGuid, itemGuid);
+        }
         public void RunBindDataSource(string value)
         {
             string o = "";
@@ -115,38 +203,127 @@ namespace br.corp.bonus630.DrawUIExplorer.Models
                 string path = match.Groups["path"].Value;
                 DataSourceProxy dsp = corelApp.FrameWork.Application.DataContext.GetDataSource(datasource);
                 object j = dsp.GetProperty(path);
-                o = string.Format("Type:{0} Value:{1}",j.GetType().Name,j);
+                o = string.Format("Type:{0} Value:{1}", j.GetType().Name, j);
             }
-            catch(Exception erro)
+            catch (Exception erro)
             {
                 o = erro.Message;
             }
             core.DispactchNewMessage(o, MsgType.Console);
         }
-        
+
         public void ShowDialog(string guid)
         {
+            try
+            {
 #if !X7
-            this.corelApp.FrameWork.ShowDialog(guid);
+                this.corelApp.FrameWork.ShowDialog(guid);
 #endif
-        }
-        public void c()
-        {
+            }
+            catch (Exception erro)
+            {
+                core.DispactchNewMessage(erro.Message, MsgType.Console);
+            }
+
 
         }
+        public void HideDialog(string guid)
+        {
+
+            try
+            {
+#if !X7
+                this.corelApp.FrameWork.HideDialog(guid);
+#endif
+            }
+            catch (Exception erro)
+            {
+                core.DispactchNewMessage(erro.Message, MsgType.Console);
+            }
+
+
+        }
+        public void ShowDocker(string guid)
+        {
+            try
+            {
+
+                this.corelApp.FrameWork.ShowDocker(guid);
+
+            }
+            catch (Exception erro)
+            {
+                core.DispactchNewMessage(erro.Message, MsgType.Console);
+            }
+
+
+        }
+        public void HideDocker(string guid)
+        {
+
+            try
+            {
+
+                this.corelApp.FrameWork.HideDocker(guid);
+
+            }
+            catch (Exception erro)
+            {
+                core.DispactchNewMessage(erro.Message, MsgType.Console);
+            }
+
+
+        }
+        //public int GetCommandBarIndexByGuid(string guid)
+        //{
+        //    for (int i = 1; i <= corelApp.FrameWork.CommandBars.Count; i++)
+        //    {
+        //        CommandBar commandBar = corelApp.FrameWork.CommandBars[i];
+        //        if (commandBar.Controls.Count == 0 || commandBar.Controls.Count != this.CommandBarMode()
+        //            continue;
+        //        string controlId = commandBar.Controls[1].ID;
+        //        //var b = core.SearchItemContainsGuidRef(controlId);
+        //        var b = core.SearchEngineGet.SearchItemFromGuid(core.ListPrimaryItens, guid, false);
+        //        if (b.Childrens.Count == 1)
+        //            b = b.Childrens[0];
+        //        else
+        //            continue;
+        //        while (b.GetType() != typeof(CommandBarData))
+        //        {
+        //            b = b.Parent;
+        //        }
+        //        if (b.Guid == guid)
+        //            return i;
+        //    }
+        //    return 0;
+        //}
         public void RunMacro(string value)
         {
             try
             {
                 string module = value.Substring(0, value.LastIndexOf("."));
-                string macro = value.Substring(value.LastIndexOf(".") + 1, value.Length - (module.Length+1));
+                string macro = value.Substring(value.LastIndexOf(".") + 1, value.Length - (module.Length + 1));
                 this.corelApp.GMSManager.RunMacro(module, macro);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 core.DispactchNewMessage(e.Message, MsgType.Console);
-          
+
             }
+        }
+        public void ShowHighLightItem(List<IBasicData> temp)
+        {
+            //Thread th = new Thread(new ParameterizedThreadStart(showHighLightItem));
+            //th.IsBackground = true;
+            //th.Start(temp);
+            showHighLightItem(temp);
+        }
+        private Thread RunInBackground(Action action)
+        {
+            Thread th = new Thread(new ThreadStart(action));
+            th.IsBackground = true;
+            th.Start();
+            return th;
         }
         private void LoadHighLightForm(IBasicData itemData, IBasicData parentItemData, IBasicData specialData, win.DependencyObject dependencyObject)
         {
@@ -203,60 +380,79 @@ namespace br.corp.bonus630.DrawUIExplorer.Models
             };
 
         }
-        public void showHighLightItem(Views.XMLTagWindow tagWindow, List<IBasicData> temp)
+        private void showHighLightItem(object list )
         {
+            List<IBasicData> temp = (List<IBasicData>)list;
             // string guidParent = "c2b44f69-6dec-444e-a37e-5dbf7ff43dae";
             //string guidItem = "fa65d0c1-879b-4ef5-9465-af09e00e91ab";
             try
             {
+                
                 string guidItem = temp[temp.Count - 1].Guid;
-                IBasicData basicData = core.SearchItemContainsGuidRef(core.ListPrimaryItens, guidItem);
-
-                while (string.IsNullOrEmpty(basicData.Guid) && basicData.Parent != null)
+                string guidParent = "";
+                if (string.IsNullOrEmpty(guidItem) && temp[temp.Count -1].TagName.Equals("item"))
                 {
-                    basicData = basicData.Parent;
+                    guidItem = temp[temp.Count - 1].GuidRef;
                 }
-                string guidParent = basicData.Guid;
-
+                IBasicData basicData = core.SearchEngineGet.SearchItemContainsGuidRef(core.ListPrimaryItens, guidItem,false);
+                if (basicData != null)
+                {
+                    while ((string.IsNullOrEmpty(basicData.Guid) && basicData.Parent != null) || basicData.GetType() == typeof(OtherData))
+                    {
+                        basicData = basicData.Parent;
+                    }
+                    
+                }
+                basicData = temp[temp.Count - 1];
+                guidParent = basicData.Guid;
+                Action<IBasicData,bool> restoration = null;
                 if (basicData.GetType() == typeof(CommandBarData))
                 {
-                    corelApp.FrameWork.Automation.ShowBar(guidParent, true);
+                    //int index = GetCommandBarIndexByGuid(guidParent);
+                    bool visible = true;
+                    try
+                    {
+                        // if (index > 0)
+                        // {
+                        string commandBarName = GetItemCaption(guidParent);
+                            CommandBar commandBar = corelApp.FrameWork.CommandBars[commandBarName];
+                            visible = commandBar.Visible;
+                        // }
 
+                        //bool visible = corelApp.FrameWork.Automation.ShowBar(guidParent);
+                        // Thread th = RunInBackground(new Action(()=> {
+                        //    core.DispactchNewMessage(DateTime.Now.ToLongTimeString()+" -  Thread", MsgType.Console);
+                        ShowHideCommandBar(commandBarName, true);
+                         //   corelApp.FrameWork.Automation.ShowBar(guidParent, true);
+                     //   }));
+                        //Thread.Sleep(5000);
+                        //th.Join();
+                        restoration = new Action<IBasicData, bool>(ShowHideCommandBar);
+                    }
+                    catch { }
+                    ShowHighLightItem(guidItem, guidParent,restoration, basicData, visible);
+                    return;
                 }
                 if (basicData.GetType() == typeof(DockerData))
                 {
+                    bool visible = corelApp.FrameWork.IsDockerVisible(guidParent);
                     corelApp.FrameWork.ShowDocker(guidParent);
+                    restoration = new Action<IBasicData, bool>((o,v)=> 
+                    {
+                        if (!v)
+                            corelApp.FrameWork.HideDocker(o.Guid);
+                        });
+                    ShowHighLightItem(guidItem, guidParent, restoration, basicData, visible);
+                    return;
                 }
                 if (basicData.GetType() == typeof(DialogData))
                 {
 #if !X7
                     corelApp.FrameWork.ShowDialog(guidParent);
+
 #endif
                 }
-                WinAPI.SetFocus(ControlUI.corelHandle);
-                WinAPI.SetForegroundWindow(ControlUI.corelHandle);
-
-                Corel.Interop.VGCore.cdrWindowState state = corelApp.AppWindow.WindowState;
-
-                corelApp.AppWindow.Activate();
-                if (state == Corel.Interop.VGCore.cdrWindowState.cdrWindowMaximized || state == Corel.Interop.VGCore.cdrWindowState.cdrWindowMinimized)
-                    corelApp.AppWindow.WindowState = Corel.Interop.VGCore.cdrWindowState.cdrWindowMaximized;
-                else
-                    corelApp.AppWindow.WindowState = Corel.Interop.VGCore.cdrWindowState.cdrWindowRestore;
-                System.Windows.Rect rect = this.GetItemRect(guidParent, guidItem);
-                if (rect.IsZero())
-                    return;
-                tagWindow.Visibility = win.Visibility.Collapsed;
-                OverlayForm form;
-                if (corelApp.AppWindow.WindowState == Corel.Interop.VGCore.cdrWindowState.cdrWindowMaximized)
-                    form = new OverlayForm(rect);
-                else
-                {
-                    System.Windows.Rect rect2 = new System.Windows.Rect(corelApp.AppWindow.Left, corelApp.AppWindow.Top, corelApp.AppWindow.Width, corelApp.AppWindow.Height);
-                    form = new OverlayForm(rect, rect2);
-                }
-                form.Show();
-                form.FormClosed += (s, e) => { tagWindow.Visibility = win.Visibility.Visible; };
+                ShowHighLightItem(guidItem, guidParent);
             }
 
             catch (System.Exception erro)
@@ -264,16 +460,85 @@ namespace br.corp.bonus630.DrawUIExplorer.Models
                 core.DispactchNewMessage(erro.Message, MsgType.Console);
             }
         }
-        public void showHighLightItem(win.DependencyObject dependencyObject,List<IBasicData> temp)
+        //private void SetCommmandBarVisible(string guid,object visible)
+        //{
+
+        //}
+        OverlayForm form;
+        public void ShowHighLightItem(string itemGuid, string itemParentGuid, Action<IBasicData, bool> restoration = null, IBasicData restorationData = null, bool v = false, bool firstTime = true)
         {
-            Views.XMLTagWindow w = Core.FindParentControl<Views.XMLTagWindow>(dependencyObject) as Views.XMLTagWindow;
-            if (w == null)
+            WinAPI.SetFocus(ControlUI.corelHandle);
+            WinAPI.SetForegroundWindow(ControlUI.corelHandle);
+
+            Corel.Interop.VGCore.cdrWindowState state = corelApp.AppWindow.WindowState;
+
+            
+            if (state == Corel.Interop.VGCore.cdrWindowState.cdrWindowMaximized || state == Corel.Interop.VGCore.cdrWindowState.cdrWindowMinimized)
+                corelApp.AppWindow.WindowState = Corel.Interop.VGCore.cdrWindowState.cdrWindowMaximized;
+            if (state == Corel.Interop.VGCore.cdrWindowState.cdrWindowRestore)
+                corelApp.AppWindow.WindowState = Corel.Interop.VGCore.cdrWindowState.cdrWindowRestore;
+            if (state == Corel.Interop.VGCore.cdrWindowState.cdrWindowNormal)
+                corelApp.AppWindow.WindowState = Corel.Interop.VGCore.cdrWindowState.cdrWindowNormal;
+            //corelApp.AppWindow.Activate();
+            
+            System.Windows.Rect rect = this.GetItemRect(itemParentGuid, itemGuid);
+            
+            if (rect.IsZero())
             {
-                core.DispactchNewMessage("Error tagWindow not found", MsgType.Console);
-                return;
+                //if (firstTime)
+                //    ShowHighLightItem(itemGuid, itemParentGuid, restoration, restorationData, v, false);
+                //else
+                //{
+                    //core.DispactchNewMessage("Don't can find the control, maybe is does not visible", MsgType.Console);
+                    return;
+                //}
+            }
+
+            core.DispactchNewMessage(DateTime.Now.ToLongTimeString(), MsgType.Console);
+
+            core.SetUIVisible = false;
+            //tagWindow.Visibility = win.Visibility.Collapsed;
+           
+            if (corelApp.AppWindow.WindowState == Corel.Interop.VGCore.cdrWindowState.cdrWindowMaximized)
+                form = new OverlayForm(rect);
+            else
+            {
+                System.Windows.Rect rect2 = new System.Windows.Rect(corelApp.AppWindow.Left, corelApp.AppWindow.Top, corelApp.AppWindow.Width, corelApp.AppWindow.Height);
+                form = new OverlayForm(rect, rect2);
+            }
+            //Thread.Sleep(1000);
+            CallForm();
+        }
+        private void CallForm( Action<IBasicData, bool> restoration = null, IBasicData restorationData = null, bool v = false)
+        {
+            if (form.InvokeRequired)
+            {
+                var d = new Action<Action<IBasicData,bool>, IBasicData,bool>(CallForm);
+                form.Invoke(restoration,restorationData,v);
+            }
+            else
+            {
+                form.Show();
+                form.FormClosed += (s, e) =>
+                {
+                    core.SetUIVisible = true;
+                    if (restoration != null)
+                        restoration.Invoke(restorationData, v);
+                };
             }
             
-            showHighLightItem(w, temp);
+           
         }
+        //public void showHighLightItem(win.DependencyObject dependencyObject, List<IBasicData> temp)
+        //{
+        //    Views.XMLTagWindow w = Core.FindParentControl<Views.XMLTagWindow>(dependencyObject) as Views.XMLTagWindow;
+        //    if (w == null)
+        //    {
+        //        core.DispactchNewMessage("Error tagWindow not found", MsgType.Console);
+        //        return;
+        //    }
+
+        //    showHighLightItem(w, temp);
+        //}
     }
 }

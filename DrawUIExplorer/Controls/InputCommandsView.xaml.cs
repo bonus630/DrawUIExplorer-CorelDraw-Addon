@@ -18,7 +18,7 @@ namespace br.corp.bonus630.DrawUIExplorer.Controls
         List<string> userCommands;
         int currentCommandIndex = 0;
 
-
+        public string Text { get { return txt_inputCommandResult.Text; } set { txt_inputCommandResult.Text = value; } }
         public InputCommandsView()
         {
             InitializeComponent();
@@ -43,6 +43,7 @@ namespace br.corp.bonus630.DrawUIExplorer.Controls
             txt_formInputCommand.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             txt_formInputCommand.AutoCompleteCustomSource = autoCompleteStringCollection;
             txt_formInputCommand.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+           
             txt_formInputCommand.Focus();
         }
         private void TextBox_KeyUp(object sender, System.Windows.Forms.KeyEventArgs e)
@@ -60,7 +61,7 @@ namespace br.corp.bonus630.DrawUIExplorer.Controls
                 // txt_inputCommandResult.AppendText(Environment.NewLine);
                 //textBox.GetLineText()
                 userCommands.Add(command);
-                currentCommandIndex++;
+                currentCommandIndex=0;
                 txt_inputCommandResult.AppendText(command);
                 txt_inputCommandResult.AppendText(Environment.NewLine);
                 string result = Core.RunCommand(command);
@@ -74,6 +75,7 @@ namespace br.corp.bonus630.DrawUIExplorer.Controls
                 // textBox.CaretIndex = textBox.Text.Length - 1;
               
             }
+            //Need fix this
             if (e.KeyCode == System.Windows.Forms.Keys.Up)
             {
                 if (userCommands.Count == 0)
@@ -108,7 +110,11 @@ namespace br.corp.bonus630.DrawUIExplorer.Controls
         {
             txt_formInputCommand.Focus();
         }
-
+        protected override void OnGotFocus(RoutedEventArgs e)
+        {
+            base.OnGotFocus(e);
+            txt_formInputCommand.Focus();
+        }
         private void txt_inputCommandResult_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             var wpfKey = e.Key == System.Windows.Input.Key.System ? e.SystemKey : e.Key;
@@ -125,34 +131,11 @@ namespace br.corp.bonus630.DrawUIExplorer.Controls
             
 
         }
-    }
-    public static class a
-    {
-        public static System.Windows.Forms.Keys ToWinforms(this System.Windows.Input.ModifierKeys modifier)
+
+        private void UserControl_FocusableChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            var retVal = System.Windows.Forms.Keys.None;
-            if (modifier.HasFlag(System.Windows.Input.ModifierKeys.Alt))
-            {
-                retVal |= System.Windows.Forms.Keys.Alt;
-            }
-            if (modifier.HasFlag(System.Windows.Input.ModifierKeys.Control))
-            {
-                retVal |= System.Windows.Forms.Keys.Control;
-            }
-            if (modifier.HasFlag(System.Windows.Input.ModifierKeys.None))
-            {
-                // Pointless I know
-                retVal |= System.Windows.Forms.Keys.None;
-            }
-            if (modifier.HasFlag(System.Windows.Input.ModifierKeys.Shift))
-            {
-                retVal |= System.Windows.Forms.Keys.Shift;
-            }
-            if (modifier.HasFlag(System.Windows.Input.ModifierKeys.Windows))
-            {
-                // Not supported lel
-            }
-            return retVal;
+            txt_formInputCommand.Focus();
         }
     }
+  
 }

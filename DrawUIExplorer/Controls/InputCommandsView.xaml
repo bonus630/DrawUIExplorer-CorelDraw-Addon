@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:br.corp.bonus630.DrawUIExplorer.Controls"
              xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms" 
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" Loaded="UserControl_Loaded" GotFocus="UserControl_GotFocus">
+             d:DesignHeight="450" d:DesignWidth="800" Loaded="UserControl_Loaded" GotFocus="UserControl_GotFocus" FocusableChanged="UserControl_FocusableChanged">
     <UserControl.Resources>
         <SolidColorBrush x:Key="TextBox.Static.Border" Color="#FFABAdB3"/>
         <SolidColorBrush x:Key="TextBox.MouseOver.Border" Color="#FF7EB4EA"/>

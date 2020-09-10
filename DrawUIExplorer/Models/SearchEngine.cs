@@ -62,7 +62,7 @@ namespace br.corp.bonus630.DrawUIExplorer.Models
             searching = true;
             countMaxLevel = 0;
             maxLevel = 1;
-            searchResult = new OtherData() { TagName = "Search" };
+            searchResult = new SearchData() { TagName = "Search" };
             genericList.Clear();
             if (SearchStarting != null)
                 SearchStarting();
@@ -151,7 +151,7 @@ namespace br.corp.bonus630.DrawUIExplorer.Models
                     if (i + 1 < actionsEnable.Count)
                     {
                         actionsEnable[i + 1].SearchBasicData = searchResult;
-                        searchResult = new OtherData() { TagName = "Search" };
+                        searchResult = new SearchData() { TagName = "Search" };
                     }
                 }
             }
@@ -416,12 +416,28 @@ namespace br.corp.bonus630.DrawUIExplorer.Models
         /// <returns></returns>
         public IBasicData SearchItemFromGuidRef(IBasicData list, string guid)
         {
-            searchResult = new OtherData() {TagName = "Search" };
+            searchResult = new SearchData() {TagName = "Search" };
             searching = true;
             searchItemFromGuidRef(list, guid);
             //if (SearchFinished != null)
             //    SearchFinished();
             return searchResult;
+        }
+        public IBasicData SearchItemFromGuid(IBasicData list, string guid, bool tagSearch = true)
+        {
+            searchResult = new SearchData() { TagName = "Search" };
+            searching = true;
+            searchItensFromGuid(list, guid);
+            //if (SearchFinished != null)
+            //    SearchFinished();
+            if (tagSearch)
+                return searchResult;
+            else
+            {
+                if (searchResult.Childrens.Count == 1)
+                    return searchResult.Childrens[0];
+                return searchResult;
+            }
         }
         private void searchItemFromGuidRef(IBasicData list, string guid)
         {
@@ -444,14 +460,23 @@ namespace br.corp.bonus630.DrawUIExplorer.Models
             
 
         }
-        public IBasicData SearchItemContainsGuidRef(IBasicData list, string guid)
+        public IBasicData SearchItemContainsGuidRef(IBasicData list, string guid,bool tagSearch = true)
         {
             //searchResult = new OtherData() { TagName = "Search" };
             searching = true;
             searchItemContainsGuidRef(list, guid);
             //if (SearchFinished != null)
             //    SearchFinished();
-            return searchResult;
+            if(tagSearch)
+                return searchResult;
+            else
+            {
+                if (searchResult == null)
+                    return null;
+                if (searchResult.Childrens.Count == 1)
+                    return searchResult.Childrens[0];
+                return searchResult;
+            }    
         }
         private void searchItemContainsGuidRef(IBasicData list, string guid)
         {

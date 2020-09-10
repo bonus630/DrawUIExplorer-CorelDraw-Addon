@@ -41,7 +41,7 @@
                     <TextBox  x:Name="txt_xml" Text="{Binding XmlText}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" AcceptsReturn="True" AcceptsTab="True" />
 
                 </ScrollViewer>
-                <Button Grid.Row="2" Content="Get XML" HorizontalAlignment="Left" VerticalAlignment="Center" Command="{Binding GenXml}" Margin="4,0,0,0"/>
+                <Button Grid.Row="2" Content="Get XML" HorizontalAlignment="Left" VerticalAlignment="Center" Command="{Binding GenXmlCommand}" Margin="4,0,0,0"/>
                 </Grid>
                 <!--<GridSplitter VerticalAlignment="Stretch" Width="2" Grid.Column="1" Background="Black" />-->
                 <Grid Grid.Column="2">
@@ -57,7 +57,7 @@
                                    />
 
                 </ScrollViewer>
-                <Button  Grid.Row="2" Content="Process" Command="{Binding Process}" VerticalAlignment="Center" VerticalContentAlignment="Top" HorizontalAlignment="Left" Margin="4,0,0,0" />
+                <Button  Grid.Row="2" Content="Process" Command="{Binding ProcessCommand}" VerticalAlignment="Center" VerticalContentAlignment="Top" HorizontalAlignment="Left" Margin="4,0,0,0" />
 
             </Grid>
             </Grid>
