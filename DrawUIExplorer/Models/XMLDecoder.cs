@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 using System.Threading;
@@ -12,14 +13,22 @@ namespace br.corp.bonus630.DrawUIExplorer.Models
     {
         private string xmlString;
         private XmlDocument xmlDocument;
+        private bool isBusy = false;
+        public bool IsBusy { get { return isBusy; } protected set { isBusy = value; } }
         public string XmlString { get { return this.xmlString; } set { this.xmlString = value; } }
 
         public event Action LoadFinish;
         private string xPath;
         public IBasicData FirstItens;
 
-        public void Process()
+        public List<string> FilePath { get; set; }
+
+        public void Process(string filePath)
         {
+            isBusy = true;
+            if (FilePath == null)
+                FilePath = new List<string>();
+            FilePath.Add(filePath);
             xmlDocument = new XmlDocument();
             try
             {
@@ -36,7 +45,10 @@ namespace br.corp.bonus630.DrawUIExplorer.Models
             FirstItens = rootNodeData;
             loadXmlNodes(rootNodeData,xmlDocument.ChildNodes.Item(1));
             if (LoadFinish != null)
+            {
+                isBusy = false;
                 LoadFinish();
+            }
         }
         //private int count = 0;
         private void loadXmlNodes(IBasicData parentBasicData, XmlNode xmlNode)

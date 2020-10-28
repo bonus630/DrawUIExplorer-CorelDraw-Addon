@@ -17,6 +17,9 @@ namespace br.corp.bonus630.DrawUIExplorer
     {
         XMLDecoder xmlDecoder;
         WorkspaceUnzip workspaceUnzip;
+        string workerFolder;
+
+       
 
         public event Action<string> LoadXmlFinish;
         public event Action<bool> RequestUIHideVisibleChanged;
@@ -58,6 +61,10 @@ namespace br.corp.bonus630.DrawUIExplorer
         public CorelAutomation CorelAutomation { get; private set; }
         public List<IBasicData> Route { get { return getRoute(); } }
         public bool SetUIVisible { set { if (RequestUIHideVisibleChanged != null) RequestUIHideVisibleChanged(value); } }
+        public Core()
+        {
+            workerFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\bonus630";
+        }
         private List<IBasicData> getRoute()
         {
             List<IBasicData> temp = new List<IBasicData>();
@@ -94,11 +101,10 @@ namespace br.corp.bonus630.DrawUIExplorer
             {
                 FileInfo fileOri = new FileInfo(filePath);
                 Title = filePath;
-                string folder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\bonus630";
                 try
                 {
-                    if (!Directory.Exists(folder))
-                        Directory.CreateDirectory(folder);
+                    if (!Directory.Exists(workerFolder))
+                        Directory.CreateDirectory(workerFolder);
                 }
                 catch (IOException ioE)
                 {
@@ -106,7 +112,7 @@ namespace br.corp.bonus630.DrawUIExplorer
                         ErrorFound("Erro - " + ioE.Message);
                     return;
                 }
-                string newPath = folder + "\\" + fileOri.Name;
+                string newPath = workerFolder + "\\" + fileOri.Name;
                 if (File.Exists(newPath))
                     File.Delete(newPath);
                 file = fileOri.CopyTo(newPath);
@@ -127,7 +133,39 @@ namespace br.corp.bonus630.DrawUIExplorer
 
 
         }
-
+        public void MergeProcess(string filePath)
+        {
+            FileInfo file = null;
+            try
+            {
+                FileInfo fileOri = new FileInfo(filePath);
+                Title = filePath;
+                try
+                {
+                    if (!Directory.Exists(workerFolder))
+                        Directory.CreateDirectory(workerFolder);
+                }
+                catch (IOException ioE)
+                {
+                    if (ErrorFound != null)
+                        ErrorFound("Erro - " + ioE.Message);
+                    return;
+                }
+                string newPath = workerFolder + "\\" + fileOri.Name;
+                if (File.Exists(newPath))
+                    File.Delete(newPath);
+                file = fileOri.CopyTo(newPath);
+            }
+            catch (IOException ioErro)
+            {
+                if (ErrorFound != null)
+                    ErrorFound("Erro - " + ioErro.Message);
+                return;
+            }
+            Thread thread = new Thread(new ParameterizedThreadStart(LoadFile));
+            thread.IsBackground = true;
+            thread.Start(file);
+        }
         private void CorelApp_OnApplicationEvent(string EventName, ref object[] Parameters)
         {
             try
@@ -284,7 +322,7 @@ namespace br.corp.bonus630.DrawUIExplorer
 
             try
             {
-                xmlDecoder.Process();
+                xmlDecoder.Process(file.FullName);
             }
             catch (Exception erro)
             {

@@ -26,7 +26,7 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
              
                 NotifyPropertyChanged(); }
         }
-        private ObservableCollection<object> attributesName = new ObservableCollection<object>();;
+        private ObservableCollection<object> attributesName = new ObservableCollection<object>();
 
         public ObservableCollection<object> AttributesName
         {
@@ -39,7 +39,7 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
                 //    AttributeName = attributesName[0].ToString(); 
                 NotifyPropertyChanged(); }
         }
-        private ObservableCollection<object> attributesValue = new ObservableCollection<object>();;
+        private ObservableCollection<object> attributesValue = new ObservableCollection<object>();
 
         public ObservableCollection<object> AttributesValue
         {

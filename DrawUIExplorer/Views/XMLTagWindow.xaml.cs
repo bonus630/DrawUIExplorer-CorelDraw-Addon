@@ -2,6 +2,7 @@
 using br.corp.bonus630.DrawUIExplorer.Models;
 using br.corp.bonus630.DrawUIExplorer.ViewModels;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -22,7 +23,7 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
         XSLTEster xslTester;
         CorelAutomation corelCmd;
         int msgCount = 1;
-        bool cancelTreeGeneration = false;
+        //bool cancelTreeGeneration = false;
         Thread th = null;
         XMLTagWindowViewModel dataContext;
         SaveLoadConfig saveLoad;
@@ -51,14 +52,15 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
         }
         public void StartProcess(string filePath)
         {
-            treeView_Nodes.Items.Clear();
-            treeView_Search.Items.Clear();
+            //treeView_Nodes.Items.Clear();
+            //treeView_Search.Items.Clear();
             msgCount = 1;
             dataContext = new XMLTagWindowViewModel(core);
             this.DataContext = dataContext;
             core.StartCore(filePath, this.app);
             dataContext.Title = filePath;
             corelCmd = new CorelAutomation(this.app, core);
+            dataContext.CorelCmd = corelCmd;
             core.LoadXmlFinish += Core_LoadFinish;
             core.FilePorcentLoad += Core_FilePorcentLoad;
             core.LoadListsFinish += Core_LoadListsFinish;
@@ -69,13 +71,33 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
             core.NewMessage += Core_NewMessage;
             core.RequestUIHideVisibleChanged += Core_RequestUIHideVisibleChanged;
             dataContext.InCorel = core.InCorel;
-            treeView_Nodes.GotFocus += (s, e) => { if (treeView_Nodes.SelectedItem != null) UpdateDetails(treeView_Nodes.SelectedItem, e); };
-            treeView_Ref.GotFocus += (s, e) => { if (treeView_Ref.SelectedItem != null) UpdateDetails(treeView_Ref.SelectedItem, e); };
-            treeView_Search.GotFocus += (s, e) => { if (treeView_Search.SelectedItem != null) UpdateDetails(treeView_Search.SelectedItem, e); };
+            //treeView_Nodes.GotFocus += (s, e) => { if (treeView_Nodes.SelectedItem != null) UpdateDetails(treeView_Nodes.SelectedItem, e); };
+            //treeView_Ref.GotFocus += (s, e) => { if (treeView_Ref.SelectedItem != null) UpdateDetails(treeView_Ref.SelectedItem, e); };
+            //treeView_Search.GotFocus += (s, e) => { if (treeView_Search.SelectedItem != null) UpdateDetails(treeView_Search.SelectedItem, e); };
+            treeView_Nodes.MouseLeftButtonUp += (s, e) => { if (treeView_Nodes.SelectedItem != null) UpdateDetails(treeView_Nodes.SelectedItem, e); };
+            treeView_Ref.MouseLeftButtonUp += (s, e) => { if (treeView_Ref.SelectedItem != null) UpdateDetails(treeView_Ref.SelectedItem, e); };
+            treeView_Search.MouseLeftButtonUp += (s, e) => { if (treeView_Search.SelectedItem != null) UpdateDetails(treeView_Search.SelectedItem, e); };
+            dataContext.XmlDecode += DataContext_XmlDecode;
             inputControl.Core = core;
             saveLoad = new SaveLoadConfig();
         }
 
+        private void DataContext_XmlDecode(IBasicData obj)
+        {
+            this.Dispatcher.Invoke(new Action(()=>
+            {
+                XmlEncoder xmlEncoder = new XmlEncoder();
+                string startString = txt_xmlViewer.Text.Substring(0, txt_xmlViewer.CaretIndex);
+                string finalString = txt_xmlViewer.Text.Substring(txt_xmlViewer.CaretIndex);
+                txt_xmlViewer.Text = string.Format("{0}{1}{2}\n\r", startString, xmlEncoder.xmlEncode1(obj), finalString);
+                //txt_xmlViewer.AppendText(XmlEncode.xmlEncode((sender as MenuItemData).Data)+"\r\n");
+            }));
+        }
+
+        public void MergeProcess(string filePath)
+        {
+            core.MergeProcess(filePath);
+        }
         private void Core_RequestUIHideVisibleChanged(bool obj)
         {
             this.Dispatcher.Invoke(new Action(() =>
@@ -99,7 +121,8 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
             //Vou testar para salvar as pesquisar
            // treeView_Search.Items.Clear();
             gridRef.Visibility = Visibility.Visible;
-            InflateTreeView(obj, treeView_Search);
+            treeView_Search.ItemsSource = dataContext.SearchList;
+            //InflateTreeView(obj, treeView_Search);
         }
 
         private void Core_ErrorFound(string obj)
@@ -120,8 +143,7 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
             SetProgressBar(false, false);
              this.Dispatcher.Invoke(new Action(() =>
             {
-                //this.DataContext = core;
-                InflateTreeView(core.ListPrimaryItens, treeView_Nodes);
+                //InflateTreeView(core.ListPrimaryItens, treeView_Nodes);
                 tabControl_details.Visibility = Visibility.Visible;
                 search = new Search(core);
                 grid_search.Children.Add(search);
@@ -131,6 +153,7 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
                 grid_xslTester.Children.Add(xslTester);
                 core.ListPrimaryItens.SetSelected(true, true, true);
                 dockPanel_treeViews.Visibility = Visibility.Visible;
+                treeView_Nodes.ItemsSource = dataContext.MainList;
             }));
 
         }
@@ -197,157 +220,38 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
             }
           ));
         }
-        private void InflateTreeView(IBasicData list, TreeView treeView)
-        {
-            TreeViewItemData treeViewItem = GenerateTreeViewItem(list);
-            treeView.Items.Add(treeViewItem);
-        }
-
-        private void GenerateTreeViewItem_Expanded(object sender, RoutedEventArgs args)
-        {
-
-            if (th != null)
-            {
-                if (th.ThreadState == System.Threading.ThreadState.Running)
-                {
-                    cancelTreeGeneration = true;
-                    //th.Abort();
-
-                }
-            }
-            th = new Thread(new ParameterizedThreadStart(GenerateTreeViewItemList));
-            th.IsBackground = true;
-            th.Start(sender);
-            args.Handled = true;
-        }
 
 
-        private void RemoveTreeViewItem_Collapsed(object sender, RoutedEventArgs args)
-        {
-            return;
-            if (th != null)
-            {
-                if (th.ThreadState == System.Threading.ThreadState.Running)
-                {
-                    th.Abort();
-                    cancelTreeGeneration = true;
-                }
-            }
-            Thread th2 = new Thread(new ThreadStart(() =>
-            {
-                SetProgressBar(true, true, "Clearning itens to treeView");
-                this.Dispatcher.Invoke(new Action(() =>
-                {
-                    (sender as TreeViewItemData).Items.Clear();
-                }));
-                SetProgressBar(false, false, "Finish Clear up");
-            }));
-            th2.IsBackground = true;
-            th2.Start();
-            args.Handled = true;
-        }
 
-        private void GenerateTreeViewItemList(object sender)
-        {
-            cancelTreeGeneration = false;
-            TreeViewItemData children = sender as TreeViewItemData;
-            if (children.IsCreated || children == null || children.Data.Childrens.Count == 0)
-                return;
-            SetProgressBar(false, true, string.Format("{0}-Loading itens to treeView", DateTime.Now.ToLongTimeString()));
-       
-            int length = children.Data.Childrens.Count;
+     
 
-            Action<object> actionSetItemInVisualTree = (object treeItens) =>
-            {
-                List<TreeViewItemData> treeViewList = treeItens as List<TreeViewItemData>;
-                for (int i = 0; i < treeViewList.Count; i++)
-                {
-                    this.Dispatcher.Invoke(new Action(() =>
-                    {
-                        children.Items.Add(treeViewList[i]);
-                    }));
-                }
-            };
-
-            int numItensPerTask = 1000;
-            int rest = length % numItensPerTask;
-            int numTasks = (length - rest) / numItensPerTask;
-            if (rest > 0)
-                numTasks++;
-            if (numTasks == 0)
-                return;
-            Task[] tasks = new Task[numTasks];
-            List<TreeViewItemData>[] viewItemDatas = new List<TreeViewItemData>[numTasks];
-            for (int i = 0; i < numTasks; i++)
-            {
-                viewItemDatas[i] = new List<TreeViewItemData>();
-                for (int j = i * numItensPerTask; j < length; j++)
-                {
-                    if (cancelTreeGeneration)
-                        break;
-                    int porcent = (int)(j * 100 / length);
-                    if (j != 0 && porcent % 2 == 0)
-                        Core_FilePorcentLoad(porcent);
-
-                    this.Dispatcher.Invoke(new Action(() =>
-                    {
-                        TreeViewItemData treeViewItem = GenerateTreeViewItem(children.Data.Childrens[j]);
-                        viewItemDatas[i].Add(treeViewItem);
-                    }));
-                    
-                }
-                tasks[i] = new Task(actionSetItemInVisualTree, viewItemDatas[i]);
-                tasks[i].Start();
-            }
-            Task.Factory.ContinueWhenAll(tasks, delegate
-            {
-                SetProgressBar(false, false, string.Format("{0}-Finish", DateTime.Now.ToLongTimeString()));
-            });
-            children.IsCreated = true;
-
-        }
-        //Método chamado pelo inflator do treeview
-        private TreeViewItemData GenerateTreeViewItem(IBasicData basicData)
-        {
-            TreeViewItemData treeViewItem = new TreeViewItemData();
-            treeViewItem.Data = basicData;
-            treeViewItem.AddHandler(TreeViewItem.ExpandedEvent, new RoutedEventHandler(GenerateTreeViewItem_Expanded));
-            treeViewItem.AddHandler(TreeViewItem.CollapsedEvent, new RoutedEventHandler(RemoveTreeViewItem_Collapsed));
-            treeViewItem.AddHandler(TreeViewItem.SelectedEvent, new RoutedEventHandler(UpdateDetails));
-            this.Dispatcher.Invoke(new Action(() =>
-            {
-                treeViewItem.ContextMenu = GenerateContextMenu(treeViewItem);
-            }));
-            //treeViewItem.AddHandler(TreeViewItem.GotFocusEvent, new RoutedEventHandler(UpdateDetails));
-            return treeViewItem;
-        }
-        private void TreeViewItemSelectedEvent(object sender, RoutedEventArgs args)
-        {
-
-            Debug.WriteLine("treeviewitemselectedevent");
-        }
-        private void TreeViewItemFocusEvent(object sender, RoutedEventArgs args)
-        {
-
-        }
+   
 
         private void UpdateDetails(object sender, RoutedEventArgs args)
         {
-            IBasicData data = (sender as TreeViewItemData).Data;
-            var parent = Core.FindParentControl<TreeView>(sender as TreeViewItemData);
+            // IBasicData data = (sender as TreeViewItemData).Data;
+            IBasicData data = (sender as IBasicData);
+            //var parent = Core.FindParentControl<TreeView>(sender as TreeViewItemData);
+            string parent = (args.Source as TreeView).Name;
+            if (core.CurrentBasicData != null)
+                core.CurrentBasicData.SetSelected(false, false, false,true);
             core.CurrentBasicData = data;
-
-            if (parent != null && (parent == treeView_Nodes || parent == treeView_Search))
+           
+            data.SetSelected(true, true, false,true);
+            if (parent != null && (parent == "treeView_Nodes" || parent == "treeView_Search"))
             {
-                treeView_Ref.Items.Clear();
+                //treeView_Ref.Items.Clear();
+                dataContext.RefList.Clear();
                 if (!string.IsNullOrEmpty(data.GuidRef))
                 {
 
                     IBasicData refBasicData = core.SearchItemFromGuidRef(core.ListPrimaryItens, data.GuidRef);
                     // InflateTreeView(refBasicData, treeView_Ref);
-                    TreeViewItemData treeViewItem = GenerateTreeViewItem(refBasicData);
-                    GenerateTreeViewItemList(treeViewItem);
-                    treeView_Ref.Items.Add(treeViewItem);
+                    //TreeViewItemData treeViewItem = GenerateTreeViewItem(refBasicData);
+                    //GenerateTreeViewItemList(treeViewItem);
+                    // treeView_Ref.Items.Add(treeViewItem);
+                    dataContext.RefList.Add(refBasicData);
+                    treeView_Ref.ItemsSource = dataContext.RefList;
                 }
                 if (treeView_Ref.Items.Count == 0 && treeView_Search.Items.Count == 0)
                     gridRef.Visibility = Visibility.Collapsed;
@@ -360,40 +264,40 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
             //lba_tagName.Content = data.TagName;
             args.Handled = true;
         }
-        private ContextMenu GenerateContextMenu(TreeViewItemData treeViewItemData)
+        private void GenerateContextMenu(TreeViewItemData treeViewItemData)
         {
-            ContextMenu contextMenu = new ContextMenu();
-            contextMenu.AddHandler(ContextMenu.ContextMenuOpeningEvent, new ContextMenuEventHandler(ContextMenu_ContextMenuOpening));
+            //ContextMenu contextMenu = new ContextMenu();
+            //contextMenu.AddHandler(ContextMenu.ContextMenuOpeningEvent, new ContextMenuEventHandler(ContextMenu_ContextMenuOpening));
 
             // itens que não precisão do app 
-            if (!string.IsNullOrEmpty(treeViewItemData.Data.GuidRef))
-            {
-                MenuItemData menuItem = new MenuItemData();
-                menuItem.Data = treeViewItemData.Data;
-                menuItem.Header = "Find Ref Item";
-                menuItem.Click += MenuFindRef_Click;
-                contextMenu.Items.Add(menuItem);
+            //if (!string.IsNullOrEmpty(treeViewItemData.Data.GuidRef))
+            //{
+            //    MenuItemData menuItem = new MenuItemData();
+            //    menuItem.Data = treeViewItemData.Data;
+            //    menuItem.Header = "Find Ref Item";
+            //    menuItem.Click += MenuFindRef_Click;
+            //    contextMenu.Items.Add(menuItem);
 
 
-            }
-            if (!string.IsNullOrEmpty(treeViewItemData.Data.Guid))
-            {
-                MenuItemData menuItem = new MenuItemData();
-                menuItem.Data = treeViewItemData.Data;
-                menuItem.Header = "Copy Guid";
-                menuItem.Icon = new System.Windows.Controls.Image() { Source = dataContext.CopyMenuItemImg };
-                menuItem.Click += MenuCopyGuid_Click;
-                contextMenu.Items.Add(menuItem);
+            //}
+            //if (!string.IsNullOrEmpty(treeViewItemData.Data.Guid))
+            //{
+            //    MenuItemData menuItem = new MenuItemData();
+            //    menuItem.Data = treeViewItemData.Data;
+            //    menuItem.Header = "Copy Guid";
+            //    menuItem.Icon = new System.Windows.Controls.Image() { Source = dataContext.CopyMenuItemImg };
+            //    menuItem.Click += MenuCopyGuid_Click;
+            //    contextMenu.Items.Add(menuItem);
 
 
-            }
+            //}
             if (treeViewItemData.Data.ContainsAttribute("captionRef"))
             {
                 MenuItemData menuItem = new MenuItemData();
                 menuItem.Data = treeViewItemData.Data;
                 menuItem.Header = "Find Caption Ref";
                 menuItem.Click += MenuItemFindCaptionRef_Click;
-                contextMenu.Items.Add(menuItem);
+                //contextMenu.Items.Add(menuItem);
             }
             //if (treeViewItemData.Data.ContainsAttribute("itemRef"))
             //{
@@ -413,132 +317,125 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
                     menuItem.Header = string.Format("Find {0}", att.Name);
                     menuItem.Tag = att.Name;
                     menuItem.Click += MenuItemFindGenericRef_Click;
-                    contextMenu.Items.Add(menuItem);
+                    //contextMenu.Items.Add(menuItem);
                 }
             }
 
 
-            MenuItemData menuItem4 = new MenuItemData();
-            menuItem4.Data = treeViewItemData.Data;
-            menuItem4.Header = "Xml";
-            menuItem4.Click += MenuItemXmlEncode_Click;
-            contextMenu.Items.Add(menuItem4);
+            //MenuItemData menuItem4 = new MenuItemData();
+            //menuItem4.Data = treeViewItemData.Data;
+            //menuItem4.Header = "Xml";
+            //menuItem4.Click += MenuItemXmlEncode_Click;
+            //contextMenu.Items.Add(menuItem4);
 
-            if (!dataContext.InCorel)
-                return contextMenu;
-
-
-
-            MenuItemData menuItem2 = new MenuItemData();
-            menuItem2.Data = treeViewItemData.Data;
-            menuItem2.Header = "Try Get Caption Text";
-            menuItem2.Click += MenuItemGetCaptionText_Click;
-            contextMenu.Items.Add(menuItem2);
-
-            MenuItemData menuItem6 = new MenuItemData();
-            menuItem6.Data = treeViewItemData.Data;
-            menuItem6.Header = "Try highlight this";
-            menuItem6.Click += MenuItemTryHighlight_Click;
-            menuItem6.Icon = new System.Windows.Controls.Image() { Source = dataContext.HighLightButtonImg };
-            contextMenu.Items.Add(menuItem6);
-
-            if (treeViewItemData.Data.GetType() == typeof(DataClass.CommandBarData))
-            {
-                MenuItemData menuItem = new MenuItemData();
-                menuItem.Data = treeViewItemData.Data;
-                menuItem.Header = "Try Show Command Bar";
-                menuItem.Click += MenuItemshowCommandBar_Click;
-                contextMenu.Items.Add(menuItem);
-
-                MenuItemData menuItem3 = new MenuItemData();
-                menuItem3.Data = treeViewItemData.Data;
-                menuItem3.Header = "Try Hide Command Bar";
-                menuItem3.Click += MenuItemHideCommandBar_Click;
-                contextMenu.Items.Add(menuItem3);
-
-                MenuItemData menuItem5 = new MenuItemData();
-                menuItem5.Data = treeViewItemData.Data;
-                menuItem5.Header = "Command Bar Mode";
-                menuItem5.Click += MenuItemCommandBarMode_Click;
-                contextMenu.Items.Add(menuItem5);
-
-            }
-            if (treeViewItemData.Data.GetType() == typeof(DataClass.OtherData))
-            {
-                MenuItemData menuItem = new MenuItemData();
-                menuItem.Data = treeViewItemData.Data;
-                menuItem.Header = "Try Show this";
-                menuItem.Click += MenuItemshowItem_Click;
-                contextMenu.Items.Add(menuItem);
-            }
-            if (treeViewItemData.Data.GetType() == typeof(DataClass.DialogData))
-            {
-                MenuItemData menuItem = new MenuItemData();
-                menuItem.Data = treeViewItemData.Data;
-                menuItem.Header = "Try Show Dialog";
-                menuItem.Click += MenuItemshowDialog_Click;
-                contextMenu.Items.Add(menuItem);
-
-                MenuItemData menuItem3 = new MenuItemData();
-                menuItem3.Data = treeViewItemData.Data;
-                menuItem3.Header = "Try Hide Dialog";
-                menuItem3.Click += MenuItemHideDialog_Click;
-                contextMenu.Items.Add(menuItem3);
-            }
-            if (treeViewItemData.Data.GetType() == typeof(DataClass.DockerData))
-            {
-                MenuItemData menuItem = new MenuItemData();
-                menuItem.Data = treeViewItemData.Data;
-                menuItem.Header = "Try Show Docker";
-                menuItem.Click += MenuItemshowDocker_Click;
-                contextMenu.Items.Add(menuItem);
-
-                MenuItemData menuItem3 = new MenuItemData();
-                menuItem3.Data = treeViewItemData.Data;
-                menuItem3.Header = "Try Hide Docker";
-                menuItem3.Click += MenuItemHideDocker_Click;
-                contextMenu.Items.Add(menuItem3);
-            }
+            //if (!dataContext.InCorel)
+            //    return contextMenu;
 
 
-            if (treeViewItemData.Data.GetType() == typeof(DataClass.ItemData))
-            {
-                MenuItemData menuItem = new MenuItemData();
-                menuItem.Data = treeViewItemData.Data;
-                menuItem.Header = "Try Invoke Item";
-                menuItem.Click += MenuItemInvoke_Click;
-                contextMenu.Items.Add(menuItem);
-            }
-            if (treeViewItemData.Data.TagName == "dockers")
-            {
-                MenuItemData menuItem = new MenuItemData();
-                menuItem.Data = treeViewItemData.Data;
-                menuItem.Header = "Get Dockers Caption";
-                menuItem.Click += MenuItemGetDockerCaption_Click;
-                contextMenu.Items.Add(menuItem);
-            }
-            if (treeViewItemData.Data.GetType() == typeof(DataClass.SearchData))
-            {
-                MenuItemData menuItem = new MenuItemData();
-                menuItem.Data = treeViewItemData.Data;
-                menuItem.Header = "Remove me";
-                menuItem.Click += MenuItemRemoveMe_Click;
-                contextMenu.Items.Add(menuItem);
-            }
+
+            //MenuItemData menuItem2 = new MenuItemData();
+            //menuItem2.Data = treeViewItemData.Data;
+            //menuItem2.Header = "Try Get Caption Text";
+            //menuItem2.Click += MenuItemGetCaptionText_Click;
+            //contextMenu.Items.Add(menuItem2);
+
+            //MenuItemData menuItem6 = new MenuItemData();
+            //menuItem6.Data = treeViewItemData.Data;
+            //menuItem6.Header = "Try highlight this";
+            //menuItem6.Click += MenuItemTryHighlight_Click;
+            //menuItem6.Icon = new System.Windows.Controls.Image() { Source = dataContext.HighLightButtonImg };
+            //contextMenu.Items.Add(menuItem6);
+
+            //if (treeViewItemData.Data.GetType() == typeof(DataClass.CommandBarData))
+            //{
+            //    MenuItemData menuItem = new MenuItemData();
+            //    menuItem.Data = treeViewItemData.Data;
+            //    menuItem.Header = "Try Show Command Bar";
+            //    menuItem.Click += MenuItemshowCommandBar_Click;
+            //    contextMenu.Items.Add(menuItem);
+
+            //    MenuItemData menuItem3 = new MenuItemData();
+            //    menuItem3.Data = treeViewItemData.Data;
+            //    menuItem3.Header = "Try Hide Command Bar";
+            //    menuItem3.Click += MenuItemHideCommandBar_Click;
+            //    contextMenu.Items.Add(menuItem3);
+
+            //    MenuItemData menuItem5 = new MenuItemData();
+            //    menuItem5.Data = treeViewItemData.Data;
+            //    menuItem5.Header = "Command Bar Mode";
+            //    menuItem5.Click += MenuItemCommandBarMode_Click;
+            //    contextMenu.Items.Add(menuItem5);
+
+            //}
+            //if (treeViewItemData.Data.GetType() == typeof(DataClass.OtherData))
+            //{
+            //    MenuItemData menuItem = new MenuItemData();
+            //    menuItem.Data = treeViewItemData.Data;
+            //    menuItem.Header = "Try Show this";
+            //    menuItem.Click += MenuItemshowItem_Click;
+            //    contextMenu.Items.Add(menuItem);
+            //}
+            //if (treeViewItemData.Data.GetType() == typeof(DataClass.DialogData))
+            //{
+            //    MenuItemData menuItem = new MenuItemData();
+            //    menuItem.Data = treeViewItemData.Data;
+            //    menuItem.Header = "Try Show Dialog";
+            //    menuItem.Click += MenuItemshowDialog_Click;
+            //    contextMenu.Items.Add(menuItem);
+
+            //    MenuItemData menuItem3 = new MenuItemData();
+            //    menuItem3.Data = treeViewItemData.Data;
+            //    menuItem3.Header = "Try Hide Dialog";
+            //    menuItem3.Click += MenuItemHideDialog_Click;
+            //    contextMenu.Items.Add(menuItem3);
+            //}
+            //if (treeViewItemData.Data.GetType() == typeof(DataClass.DockerData))
+            //{
+            //    MenuItemData menuItem = new MenuItemData();
+            //    menuItem.Data = treeViewItemData.Data;
+            //    menuItem.Header = "Try Show Docker";
+            //    menuItem.Click += MenuItemshowDocker_Click;
+            //    contextMenu.Items.Add(menuItem);
+
+            //    MenuItemData menuItem3 = new MenuItemData();
+            //    menuItem3.Data = treeViewItemData.Data;
+            //    menuItem3.Header = "Try Hide Docker";
+            //    menuItem3.Click += MenuItemHideDocker_Click;
+            //    contextMenu.Items.Add(menuItem3);
+            //}
 
 
-            return contextMenu;
+            //if (treeViewItemData.Data.GetType() == typeof(DataClass.ItemData))
+            //{
+            //    MenuItemData menuItem = new MenuItemData();
+            //    menuItem.Data = treeViewItemData.Data;
+            //    menuItem.Header = "Try Invoke Item";
+            //    menuItem.Click += MenuItemInvoke_Click;
+            //    contextMenu.Items.Add(menuItem);
+            //}
+            //if (treeViewItemData.Data.TagName == "dockers")
+            //{
+            //    MenuItemData menuItem = new MenuItemData();
+            //    menuItem.Data = treeViewItemData.Data;
+            //    menuItem.Header = "Get Dockers Caption";
+            //    menuItem.Click += MenuItemGetDockerCaption_Click;
+            //    contextMenu.Items.Add(menuItem);
+
+            //    //MenuItemData menuItem12 = new MenuItemData();
+            //    //menuItem12.Data = treeViewItemData.Data;
+            //    //menuItem12.Header = "Get Dockers Guids";
+            //    //menuItem12.Click += MenuItemGetDockersGuid_Click;
+            //    //contextMenu.Items.Add(menuItem12);
+            //}
+        
+
+
+            //return contextMenu;
         }
 
-        private void MenuItemRemoveMe_Click(object sender, RoutedEventArgs e)
-        {
-            MenuItem MenuData = (sender as MenuItem);
-            DependencyObject parent = Core.FindParentControl<TreeViewItem>(MenuData);
-            if (parent == null)
-                return;
-            TreeViewItem p = parent as TreeViewItem;
-            treeView_Search.Items.Remove(p);
-        }
+    
+
+    
         #region ContextMenu Items Click Events
         private void MenuItemFindGenericRef_Click(object sender, RoutedEventArgs e)
         {
@@ -564,11 +461,7 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
             IBasicData basicData = (sender as MenuItemData).Data;
             FindAnyRef("captionRef", basicData);
         }
-        //private void MenuItemFindItemRef_Click(object sender, RoutedEventArgs e)
-        //{
-        //    IBasicData basicData = (sender as MenuItemData).Data;
-        //    FindAnyRef("itemRef", basicData);
-        //}
+     
         private void FindAnyRef(string genericRef, IBasicData basicData)
         {
             string guid = "";
@@ -582,123 +475,20 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
                 core.FindByGuid(core.ListPrimaryItens.Childrens, guid);
         }
 
-        private void MenuItemInvoke_Click(object sender, RoutedEventArgs e)
-        {
-            corelCmd.InvokeItem((sender as MenuItemData).Data);
-        }
-        private void MenuItemXmlEncode_Click(object sender, RoutedEventArgs e)
-        {
-            XmlEncoder xmlEncoder = new XmlEncoder();
-            string startString = txt_xmlViewer.Text.Substring(0, txt_xmlViewer.CaretIndex);
-            string finalString = txt_xmlViewer.Text.Substring(txt_xmlViewer.CaretIndex);
-            txt_xmlViewer.Text = string.Format("{0}{1}{2}\n\r", startString, xmlEncoder.xmlEncode1((sender as MenuItemData).Data), finalString);
-            //txt_xmlViewer.AppendText(XmlEncode.xmlEncode((sender as MenuItemData).Data)+"\r\n");
-        }
-        private void MenuItemGetDockerCaption_Click(object sender, RoutedEventArgs e)
-        {
+    
+        //private void MenuItemXmlEncode_Click(object sender, RoutedEventArgs e)
+        //{
+        //    XmlEncoder xmlEncoder = new XmlEncoder();
+        //    string startString = txt_xmlViewer.Text.Substring(0, txt_xmlViewer.CaretIndex);
+        //    string finalString = txt_xmlViewer.Text.Substring(txt_xmlViewer.CaretIndex);
+        //    txt_xmlViewer.Text = string.Format("{0}{1}{2}\n\r", startString, xmlEncoder.xmlEncode1((sender as MenuItemData).Data), finalString);
+        //    //txt_xmlViewer.AppendText(XmlEncode.xmlEncode((sender as MenuItemData).Data)+"\r\n");
+        //}
+ 
 
-            SetProgressBar(true, true, "Corel will open all Dockers, please wait...");
-            IBasicData basicData = (sender as MenuItemData).Data;
-            for (int i = 0; i < basicData.Childrens.Count; i++)
-            {
-                IBasicData temp = basicData.Childrens[i];
-                if (temp.GetType() == typeof(DockerData))
-                {
-                    if (string.IsNullOrEmpty(temp.Caption))
-                    {
-                        temp.Caption = app.FrameWork.Automation.GetCaptionText(temp.Guid);
-                    }
-                    if (string.IsNullOrEmpty(temp.Caption))
-                    {
-                        try
-                        {
-                            app.FrameWork.ShowDocker(temp.Guid);
-                            temp.Caption = app.FrameWork.Automation.GetCaptionText(temp.Guid);
-                            app.FrameWork.HideDocker(temp.Guid);
-                        }
-                        catch { }
-                    }
-                }
-            }
-            SetProgressBar(false, false, "All Dockers crawleds");
-
-
-        }
-        private void MenuItemshowDialog_Click(object sender, RoutedEventArgs e)
-        {
-               corelCmd.ShowDialog((sender as MenuItemData).Data.Guid);
-        }
-        private void MenuItemHideDialog_Click(object sender, RoutedEventArgs e)
-        {
-#if !X7
-            corelCmd.HideDialog((sender as MenuItemData).Data.Guid);
-#endif
-        }
-        private void MenuItemshowDocker_Click(object sender, RoutedEventArgs e)
-        {
-            corelCmd.ShowDocker((sender as MenuItemData).Data.Guid);
-        }
-        private void MenuItemHideDocker_Click(object sender, RoutedEventArgs e)
-        {
-            corelCmd.HideDocker((sender as MenuItemData).Data.Guid);
-        }
-        private void MenuItemshowCommandBar_Click(object sender, RoutedEventArgs e)
-        {
-            showHideCommandBar(sender);
-
-        }
-        private void MenuItemHideCommandBar_Click(object sender, RoutedEventArgs e)
-        {
-            showHideCommandBar(sender, false);
-        }
-        private void MenuItemCommandBarMode_Click(object sender, RoutedEventArgs e)
-        {
-            corelCmd.CommandBarMode((sender as MenuItemData).Data, false);
-        }
-        private void MenuItemshowItem_Click(object sender, RoutedEventArgs e)
-        {
-               corelCmd.ShowBar((sender as MenuItemData).Data.Guid);
-        }
-        private void MenuItemGetCaptionText_Click(object sender, RoutedEventArgs e)
-        {
-            core.DispactchNewMessage(corelCmd.GetCaption((sender as IBasicData).Guid),MsgType.Console);
-        }
-        private void MenuItemTryHighlight_Click(object sender, RoutedEventArgs e)
-        {
-            btn_showTreeView_Click(sender, e);
-        }
-        private void showHideCommandBar(object sender, bool show = true)
-        {
-           
-            IBasicData basicData = (sender as MenuItemData).Data;
-            corelCmd.ShowHideCommandBar(basicData, show);
-        }
       
-        private void MenuFindRef_Click(object sender, RoutedEventArgs e)
-        {
-            IBasicData basicData1 = (sender as MenuItemData).Data;
-             basicData1.Caption = corelCmd.GetCaption(basicData1.Guid);
-            core.FindByGuid(core.ListPrimaryItens.Childrens, basicData1.GuidRef);
-        }
-        private void MenuCopyGuid_Click(object sender, RoutedEventArgs e)
-        {
-            IBasicData basicData1 = (sender as MenuItemData).Data;
-            System.Windows.Clipboard.SetText(basicData1.Guid);
-            SetProgressBar(false, false, string.Format("Copied    {0}", basicData1.Guid));
-        }
-        private void ContextMenu_ContextMenuOpening(object sender, ContextMenuEventArgs e)
-        {
-
-            MenuItemData menuItem = sender as MenuItemData;
-
-            DependencyObject parent = Core.FindParentControl<TreeViewItem>(menuItem);
-            if (parent == null)
-                return;
-            TreeViewItem p = parent as TreeViewItem;
-            p.IsSelected = true;
-            //details.Update();
-            e.Handled = true;
-        }
+     
+      
         #endregion
         private void txt_inputCommand_PreviewKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {

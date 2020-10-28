@@ -13,9 +13,10 @@ namespace br.corp.bonus630.DrawUIExplorer.DataClass
         string GuidRef { get; set; }
         string TagName { get; set; }
         bool IsSelected { get;  }
-        void SetSelected(bool isSelected,bool? isExpands, bool update);
+        void SetSelected(bool isSelected,bool? isExpands, bool update, bool recursive = false);
         string Caption { get; set; }
         int XmlChildreID { get; }
+        int PathIndex { get; }
         int XmlChildreParentID { get; }
         int TreeLevel {  get; }
         List<Attribute> Attributes { get; set; }
@@ -28,6 +29,9 @@ namespace br.corp.bonus630.DrawUIExplorer.DataClass
         bool ContainsAttributeValuePartial(string AttributeValue);
         string GetAttribute(string AttributeName);
         void SetXmlChildreID(int id);
+
+        void SetPathIndex(int index);
+
          void SetXmlChildreParentID(int id = -1);
         void SetTreeLevel(int parentLevel);
          event Action<bool,bool?,bool> SelectedEvent;

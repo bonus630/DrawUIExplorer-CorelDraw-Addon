@@ -1,0 +1,1 @@
+Explore the drawui.xml file in a visual tree, this addon for coreldraw will take your find guid job easy

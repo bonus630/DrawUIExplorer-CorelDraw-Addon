@@ -50,6 +50,7 @@ namespace br.corp.bonus630.DrawUIExplorer.Models
         {
             int left, top, width, height = 0;
             bool data = corelApp.FrameWork.Automation.GetItemScreenRect(guidParent, guidItem, out left, out top, out width, out height);
+            core.DispactchNewMessage(string.Format("X:{0},Y:{1},W:{2},H:{3}", left, top,width, height), MsgType.Console);
             return new System.Windows.Rect() { X = left, Y = top, Width = width, Height = height };
 
         }
@@ -303,7 +304,7 @@ namespace br.corp.bonus630.DrawUIExplorer.Models
             {
                 string module = value.Substring(0, value.LastIndexOf("."));
                 string macro = value.Substring(value.LastIndexOf(".") + 1, value.Length - (module.Length + 1));
-                this.corelApp.GMSManager.RunMacro(module, macro);
+                this.corelApp.GMSManager.RunMacro(module, macro,null);
             }
             catch (Exception e)
             {

@@ -6,9 +6,11 @@
         x:Class="br.corp.bonus630.DrawUIExplorer.Views.XMLTagWindow"
         xmlns:Converters="clr-namespace:br.corp.bonus630.DrawUIExplorer.Converters"
         xmlns:controls="clr-namespace:br.corp.bonus630.DrawUIExplorer.Controls"
+        xmlns:dt="clr-namespace:br.corp.bonus630.DrawUIExplorer.DataClass"
         Title="{Binding Title}" Height="560" Width="840" MinWidth="840" HorizontalAlignment="Center" VerticalAlignment="Center"  WindowStartupLocation="CenterScreen" WindowState="Maximized" MinHeight="560" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"
         >
     <Window.Resources>
+
         <ResourceDictionary>
             <Converters:BoolVisibilityConverter x:Key="BoolVisibilityConverter" />
             <Converters:InvertBoolVisibilityConverter x:Key="InvertBoolVisibilityConverter" />
@@ -18,6 +20,7 @@
                 <ResourceDictionary Source="../Resources/Colors.xaml"/>
                 <ResourceDictionary Source="../Resources/Styles.xaml"/>
                 <ResourceDictionary Source="../Resources/Images.xaml"/>
+                <ResourceDictionary Source="../Resources/ContextMenu.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
@@ -82,7 +85,38 @@
                     <RowDefinition Height="*"/>-->
                 </Grid.RowDefinitions>
                 <Label Content="Main Tree:" Grid.Row="0" FontFamily="Segoe UI Black" Background="#FF8AF971"/>
-                <TreeView  Grid.Row="1"  x:Name="treeView_Nodes"  Margin="0" BorderBrush="{x:Null}" Background="#FFE3FDD4"/>
+                <TreeView  Grid.Row="1"  x:Name="treeView_Nodes"  Margin="0" BorderBrush="{x:Null}" Background="#FFE3FDD4" 
+                           VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling">
+
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource TreeViewItemStyle}">
+                            <Setter Property="ContextMenu" Value="{StaticResource contextMenu}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=IsSelected}" Value="true">
+                                    <Setter Property="IsSelected" Value="True" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                        
+                     
+                    </TreeView.ItemContainerStyle>
+
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate  ItemsSource="{Binding Path=Childrens}">
+                            <HeaderedContentControl Header="{Binding Path=TagValue}"/>
+
+                            <!--<Label Content="{Binding Path=TagName}"/>-->
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                    <!--<DataTemplate x:Key="SingleItem">
+                            <Label Content="{Binding Path=TagName}"/>
+                        </DataTemplate>-->
+
+                    <!--<TreeViewItem >
+                        <Label Content="teste"></Label>
+                    </TreeViewItem>-->
+
+                </TreeView>
 
             </Grid>
             <Grid DockPanel.Dock="Left" Width="Auto"  Margin="4,-2,2,0" Name="gridRef" Visibility="Collapsed">
@@ -94,9 +128,51 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Label Content="Ref Tree:" Background="#FF8AF971" Grid.Row="0" FontFamily="Segoe UI Black" Grid.RowSpan="2" Padding="5"/>
-                <TreeView  x:Name="treeView_Ref" Grid.Row="2" Margin="0" BorderBrush="{x:Null}" Background="#FFE3FDD4"/>
+                <TreeView  x:Name="treeView_Ref" Grid.Row="2" Margin="0" BorderBrush="{x:Null}" Background="#FFE3FDD4" 
+                           VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling">
+
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource TreeViewItemStyle}">
+                            <Setter Property="ContextMenu" Value="{StaticResource contextMenu}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=IsSelected}" Value="true">
+                                    <Setter Property="IsSelected" Value="True" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+
+                    </TreeView.ItemContainerStyle>
+
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate  ItemsSource="{Binding Path=Childrens}">
+                            <HeaderedContentControl Header="{Binding Path=TagValue}"/>
+                            <!--<Label Content="{Binding Path=TagName}"/>-->
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
                 <Label Content="Search Tree:" Background="#FF8AF971" Grid.Row="3" FontFamily="Segoe UI Black"/>
-                <TreeView VerticalAlignment="Stretch"  Grid.Row="4" x:Name="treeView_Search" Margin="0,2,0,0" BorderBrush="{x:Null}" Background="#FFE3FDD4"/>
+                <TreeView VerticalAlignment="Stretch"  Grid.Row="4" x:Name="treeView_Search" Margin="0,2,0,0" BorderBrush="{x:Null}" Background="#FFE3FDD4" 
+                           VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling">
+
+                    <TreeView.ItemContainerStyle>
+                        <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource TreeViewItemStyle}">
+                            <Setter Property="ContextMenu" Value="{StaticResource contextMenu}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=IsSelected}" Value="true">
+                                    <Setter Property="IsSelected" Value="True" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+
+                    </TreeView.ItemContainerStyle>
+
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate  ItemsSource="{Binding Path=Childrens}">
+                            <HeaderedContentControl Header="{Binding Path=TagValue}"/>
+                            <!--<Label Content="{Binding Path=TagName}"/>-->
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
             </Grid>
         </DockPanel>
         <Grid DockPanel.Dock="Bottom" Height="{Binding ConsoleExpanded,Converter={StaticResource BoolHeightConverter}}" VerticalAlignment="Bottom"  Margin="2,2,2,0" Background="#FFE3FDD4" Name="grid_consoles">

@@ -9,7 +9,7 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
 {
     public class DetailsViewModel : ViewModelDataBase
     {
-        Core core;
+     
         List<IBasicData> temp;
         CorelAutomation corelAutomation;
         private Corel.Interop.VGCore.Application corelApp;

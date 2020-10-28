@@ -1,4 +1,6 @@
-﻿using System;
+﻿using br.corp.bonus630.DrawUIExplorer.ViewModels;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -7,11 +9,14 @@ using System.Threading.Tasks;
 
 namespace br.corp.bonus630.DrawUIExplorer.DataClass
 {
-    public abstract class BasicData<T> : IComparable, IBasicData 
+    public abstract class BasicData<T> : ViewModelBase, IComparable, IBasicData 
     {
         public string Guid { get; set; }
         public string GuidRef { get; set; }
         public string TagName { get; set; }
+        public int PathIndex { get; private set; }
+
+        public string TagValue { get { if (Childrens == null || Childrens.Count == 0) return TagName; else return string.Format("{0} [{1}]", TagName, Childrens.Count); } }
         public string Caption { get; set; }
         private Type type;
         private int xmlChildreID;
@@ -25,7 +30,10 @@ namespace br.corp.bonus630.DrawUIExplorer.DataClass
         public int TreeLevel { get { return this.treeLevel; } }
 
         public List<Attribute> Attributes { get; set; }
-        public ObservableCollection<IBasicData> Childrens { get; set; }
+        private ObservableCollection<IBasicData> childrens;
+        public ObservableCollection<IBasicData> Childrens { get { 
+                return childrens; } 
+            set {childrens = value; NotifyPropertyChanged(); } }
         public bool IsSelected { get { return this.isSelected; }  }
         public bool IsSpecialType { get { return this.isSpecialType; } }
         public IBasicData Parent { get; set; }
@@ -36,7 +44,8 @@ namespace br.corp.bonus630.DrawUIExplorer.DataClass
         public BasicData()
         {
             this.type = typeof(T);
-            Childrens = new ObservableCollection<IBasicData>();
+            if (childrens == null)
+                childrens = new ObservableCollection<IBasicData>();
             Attributes = new List<Attribute>();
             setSpecialType();
         }
@@ -53,7 +62,10 @@ namespace br.corp.bonus630.DrawUIExplorer.DataClass
         {
             this.treeLevel = parentLevel + 1;
         }
-
+        public void SetPathIndex(int index)
+        {
+            PathIndex = index;
+        }
         public int CompareTo(object obj)
         {
             BasicData<T> basicData = (obj as BasicData<T>);
@@ -126,13 +138,18 @@ namespace br.corp.bonus630.DrawUIExplorer.DataClass
         }
         public void Add(IBasicData basicData)
         {
-            this.Childrens.Add(basicData);
+            if(childrens == null)
+                childrens = new ObservableCollection<IBasicData>();
+            this.childrens.Add(basicData);
+            NotifyPropertyChanged("Childrens");
         }
         public override bool Equals(object obj)
         {
             if (obj == null)
                 return false;
             IBasicData basicData = obj as IBasicData;
+            if (basicData == null)
+                return false;
             //This comparison can't still work in merge case
             if (this.TagName == basicData.TagName && this.Guid == basicData.Guid && this.XmlChildreID == basicData.XmlChildreID)
                 return true;
@@ -147,11 +164,14 @@ namespace br.corp.bonus630.DrawUIExplorer.DataClass
             return hashCode;
         }
 
-        public void SetSelected(bool isSelected,bool? isExpands, bool update)
+        public void SetSelected(bool isSelected,bool? isExpands, bool update,bool recursive = false)
         {
             this.isSelected = isSelected;
             if (SelectedEvent != null)
-                SelectedEvent(this.isSelected,isExpands,update); 
+                SelectedEvent(this.isSelected,isExpands,update);
+            NotifyPropertyChanged("IsSelected");
+            if (recursive && this.Parent != null)
+                this.Parent.SetSelected(isSelected, isExpands, update, recursive);
         }
 
         public bool IAmUniqueTag()
@@ -167,6 +187,16 @@ namespace br.corp.bonus630.DrawUIExplorer.DataClass
         {
             return string.Format("{0}[{1}]",this.TagName,this.XmlChildreID);
         }
+
+        //public IEnumerator<T> GetEnumerator()
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        //IEnumerator IEnumerable.GetEnumerator()
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
   
           
