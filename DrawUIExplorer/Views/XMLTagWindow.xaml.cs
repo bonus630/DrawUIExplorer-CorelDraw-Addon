@@ -74,9 +74,9 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
             //treeView_Nodes.GotFocus += (s, e) => { if (treeView_Nodes.SelectedItem != null) UpdateDetails(treeView_Nodes.SelectedItem, e); };
             //treeView_Ref.GotFocus += (s, e) => { if (treeView_Ref.SelectedItem != null) UpdateDetails(treeView_Ref.SelectedItem, e); };
             //treeView_Search.GotFocus += (s, e) => { if (treeView_Search.SelectedItem != null) UpdateDetails(treeView_Search.SelectedItem, e); };
-            treeView_Nodes.MouseLeftButtonUp += (s, e) => { if (treeView_Nodes.SelectedItem != null) UpdateDetails(treeView_Nodes.SelectedItem, e); };
-            treeView_Ref.MouseLeftButtonUp += (s, e) => { if (treeView_Ref.SelectedItem != null) UpdateDetails(treeView_Ref.SelectedItem, e); };
-            treeView_Search.MouseLeftButtonUp += (s, e) => { if (treeView_Search.SelectedItem != null) UpdateDetails(treeView_Search.SelectedItem, e); };
+            treeView_Nodes.SelectedItemChanged += (s, e) => { if (treeView_Nodes.SelectedItem != null) UpdateDetails(treeView_Nodes.SelectedItem, e); };
+            treeView_Ref.SelectedItemChanged += (s, e) => { if (treeView_Ref.SelectedItem != null) UpdateDetails(treeView_Ref.SelectedItem, e); };
+            treeView_Search.SelectedItemChanged += (s, e) => { if (treeView_Search.SelectedItem != null) UpdateDetails(treeView_Search.SelectedItem, e); };
             dataContext.XmlDecode += DataContext_XmlDecode;
             inputControl.Core = core;
             saveLoad = new SaveLoadConfig();

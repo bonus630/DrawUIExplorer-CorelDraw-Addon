@@ -36,6 +36,18 @@
     <Style x:Key="ConsoleExpanded" TargetType="Image">
         <Setter Property="Source" Value="{Binding Source={StaticResource collapseArrow},Converter={StaticResource ResourceToMediaImageConverter}}"/>
     </Style>
+    <System:String x:Key="visibleEnable">visibleEnable</System:String>
+    <Style x:Key="ShowMenuItemImg" TargetType="Image">
+        <Setter Property="Source" Value="{Binding Source={StaticResource visibleEnable},Converter={StaticResource ResourceToMediaImageConverter}}"/>
+    </Style>
+    <System:String x:Key="visibleDisable">visibleDisable</System:String>
+    <Style x:Key="HideMenuItemImg" TargetType="Image">
+        <Setter Property="Source" Value="{Binding Source={StaticResource visibleDisable},Converter={StaticResource ResourceToMediaImageConverter}}"/>
+    </Style>
+    <System:String x:Key="flash">flash</System:String>
+    <Style x:Key="InvokeMenuItemImg" TargetType="Image">
+        <Setter Property="Source" Value="{Binding Source={StaticResource flash},Converter={StaticResource ResourceToMediaImageConverter}}"/>
+    </Style>
     
 
 </ResourceDictionary>

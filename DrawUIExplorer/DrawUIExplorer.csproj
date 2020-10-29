@@ -342,6 +342,7 @@
     <Content Include="Assets\copy.png" />
     <Content Include="Assets\copy_icon.ico" />
     <Content Include="Assets\expandArrow.png" />
+    <None Include="Assets\flash.png" />
     <Content Include="Assets\light.png" />
     <Content Include="Assets\paste.png" />
     <Content Include="Assets\paste_icon.ico" />

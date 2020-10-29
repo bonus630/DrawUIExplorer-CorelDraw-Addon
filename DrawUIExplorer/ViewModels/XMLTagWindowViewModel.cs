@@ -115,6 +115,8 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
         }
         private bool IsItemData(IBasicData basicData)
         {
+            if (!incorel)
+                return false;
             return IsTypeOf(basicData, typeof(ItemData));
         }
         private bool IsDockerData(IBasicData basicData)

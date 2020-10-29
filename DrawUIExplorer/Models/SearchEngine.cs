@@ -279,6 +279,8 @@ namespace br.corp.bonus630.DrawUIExplorer.Models
 
         private void searchAllTags(IBasicData basicData)
         {
+            if (basicData == null)
+                return;
             for (int i = 0; i < basicData.Childrens.Count; i++)
             {
                 if (!genericList.Contains(basicData.Childrens[i].TagName))

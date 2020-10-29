@@ -90,32 +90,21 @@
 
                     <TreeView.ItemContainerStyle>
                         <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource TreeViewItemStyle}">
+                            <Setter Property="KeyboardNavigation.TabNavigation" Value="Continue"/>
                             <Setter Property="ContextMenu" Value="{StaticResource contextMenu}"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Path=IsSelected}" Value="true">
-                                    <Setter Property="IsSelected" Value="True" />
+                                    <Setter Property="Background" Value="#7F1D3806" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
-                        
-                     
                     </TreeView.ItemContainerStyle>
 
                     <TreeView.ItemTemplate>
                         <HierarchicalDataTemplate  ItemsSource="{Binding Path=Childrens}">
-                            <HeaderedContentControl Header="{Binding Path=TagValue}"/>
-
-                            <!--<Label Content="{Binding Path=TagName}"/>-->
+                            <HeaderedContentControl Header="{Binding Path=TagValue}" Focusable="False"/>
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>
-                    <!--<DataTemplate x:Key="SingleItem">
-                            <Label Content="{Binding Path=TagName}"/>
-                        </DataTemplate>-->
-
-                    <!--<TreeViewItem >
-                        <Label Content="teste"></Label>
-                    </TreeViewItem>-->
-
                 </TreeView>
 
             </Grid>
@@ -133,14 +122,14 @@
 
                     <TreeView.ItemContainerStyle>
                         <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource TreeViewItemStyle}">
+                            <Setter Property="KeyboardNavigation.TabNavigation" Value="Continue"/>
                             <Setter Property="ContextMenu" Value="{StaticResource contextMenu}"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Path=IsSelected}" Value="true">
-                                    <Setter Property="IsSelected" Value="True" />
+                                    <Setter Property="Background" Value="#7F1D3806" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
-
                     </TreeView.ItemContainerStyle>
 
                     <TreeView.ItemTemplate>
@@ -156,14 +145,14 @@
 
                     <TreeView.ItemContainerStyle>
                         <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource TreeViewItemStyle}">
+                            <Setter Property="KeyboardNavigation.TabNavigation" Value="Continue"/>
                             <Setter Property="ContextMenu" Value="{StaticResource contextMenu}"/>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Path=IsSelected}" Value="true">
-                                    <Setter Property="IsSelected" Value="True" />
+                                    <Setter Property="Background" Value="#7F1D3806" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
-
                     </TreeView.ItemContainerStyle>
 
                     <TreeView.ItemTemplate>
