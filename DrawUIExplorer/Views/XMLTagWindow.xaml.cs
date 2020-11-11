@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -24,7 +25,7 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
         CorelAutomation corelCmd;
         int msgCount = 1;
         //bool cancelTreeGeneration = false;
-        Thread th = null;
+       // Thread th = null;
         XMLTagWindowViewModel dataContext;
         SaveLoadConfig saveLoad;
         //public static bool inCorel = true;
@@ -154,6 +155,7 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
                 core.ListPrimaryItens.SetSelected(true, true, true);
                 dockPanel_treeViews.Visibility = Visibility.Visible;
                 treeView_Nodes.ItemsSource = dataContext.MainList;
+                UpdateDetails(core.ListPrimaryItens, new RoutedEventArgs(null, treeView_Nodes));
             }));
 
         }
@@ -262,7 +264,7 @@ namespace br.corp.bonus630.DrawUIExplorer.Views
             //search.Update(data);
             //xslTester.Update(data);
             //lba_tagName.Content = data.TagName;
-            args.Handled = true;
+           // args.Handled = true;
         }
         private void GenerateContextMenu(TreeViewItemData treeViewItemData)
         {

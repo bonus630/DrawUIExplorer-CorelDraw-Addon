@@ -29,9 +29,9 @@ namespace br.corp.bonus630.DrawUIExplorer
         public event Action<int> FilePorcentLoad;
         public event Action<string> ErrorFound;
         public event Action<IBasicData> SearchResultEvent;
-        public event Action<List<object>> GenericSearchResultEvent;
+        //public event Action<List<object>> GenericSearchResultEvent;
         public event Action<string, MsgType> NewMessage;
-        public event PropertyChangedEventHandler PropertyChanged;
+        //public event PropertyChangedEventHandler PropertyChanged;
         public event Action<IBasicData> CurrentBasicDataChanged;
 
         public IBasicData ListPrimaryItens { get; set; }

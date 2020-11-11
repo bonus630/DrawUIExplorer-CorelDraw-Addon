@@ -123,6 +123,9 @@ namespace br.corp.bonus630.DrawUIExplorer
 #if X11
                   result = corelApp.GetApplicationPreferenceValue("WindowScheme", "Colors").ToString();
 #endif
+#if X12
+                  result = corelApp.GetApplicationPreferenceValue("WindowScheme", "Colors").ToString();
+#endif
                 if (!result.Equals(currentTheme))
                 {
                     currentTheme = result;

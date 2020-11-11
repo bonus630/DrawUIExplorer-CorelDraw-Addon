@@ -3,12 +3,9 @@ using br.corp.bonus630.DrawUIExplorer.Models;
 using br.corp.bonus630.DrawUIExplorer.ViewModels.Commands;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection;
-using System.Threading;
 using System.Windows;
-using System.Windows.Media.Imaging;
 
 namespace br.corp.bonus630.DrawUIExplorer.ViewModels
 {
@@ -71,22 +68,15 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
             }
         }
 
-        // public BitmapSource HighLightButtonImg { get { return Properties.Resources.light.GetBitmapSource(); } }
         System.Windows.Forms.AutoCompleteStringCollection AutoCompleteSource { get; set; }
-
-        //public SimpleCommand configCommand, clearConsoleCommmand, expandConsoleCommand, highLightCommand, activeGuidCommand;
 
         public SimpleCommand ConfigCommand { get { return new SimpleCommand(config); } }
         public SimpleCommand ExpandConsoleCommand { get { return new SimpleCommand(expandConsole); } }
         public SimpleCommand ActiveGuidCommand { get { return new SimpleCommand(activeGuid); } }
-        public SimpleCommand HighLightCommand { get { return new SimpleCommand(showHighLightItem); } }
+        public SimpleCommand HighLightCommand { get; protected set; }
 
-
-        public BaseDataCommand FindRefItemCommand { get; protected set; }
-        public BaseDataCommand CopyGuidCommand { get; protected set; }
-        public BaseDataCommand FindCaptionRefCommand { get; protected set; }
-        public BaseDataCommand FindGuidCommand { get; protected set; }
-        public BaseDataCommand FindGuidRefCommand { get; protected set; }
+        public AttributeCommand FindRef { get; protected set; }
+       public BaseDataCommand CopyGuidCommand { get; protected set; }
         public BaseDataCommand XmlCommand { get; protected set; }
         public BaseDataCommand GetCaptionCommand { get; protected set; }
         public BaseDataCommand ShowCommandBarCommand { get; protected set; }
@@ -102,7 +92,30 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
         public BaseDataCommand GetDockersCaptionCommand { get; protected set; }
         public BaseDataCommand GetDockersGuidCommand { get; protected set; }
         public BaseDataCommand RemoveMeCommand { get; protected set; }
+        private void initializeCommands()
+        {
+            CopyGuidCommand = new BaseDataCommand(CopyGuidExec, HasGuid);
 
+            FindRef = new AttributeCommand(FindRefExec, IsAttributeRef);
+
+           
+            XmlCommand = new BaseDataCommand(XmlExec, IsTrue);
+            GetCaptionCommand = new BaseDataCommand(GetCaptionTextExec, HasGuid);
+            ShowCommandBarCommand = new BaseDataCommand(ShowCommandBarExec, IsCommandBarData);
+            HideCommandBarCommand = new BaseDataCommand(HideCommandBarExec, IsCommandBarData);
+            CommandBarModeCommand = new BaseDataCommand(CommandBarModeExec, IsCommandBarData);
+            ShowThisCommand = new BaseDataCommand(ShowItemExec, IsItemData);
+            HideThisCommand = new BaseDataCommand(CopyGuidExec, IsItemData);
+            ShowDialogCommand = new BaseDataCommand(ShowDialogExec, IsDialogData);
+            HideDialogCommand = new BaseDataCommand(HideDialogExec, IsDialogData);
+            ShowDockerCommand = new BaseDataCommand(ShowDockerExec, IsDockerData);
+            HideDockerCommand = new BaseDataCommand(HideDockerExec, IsDockerData);
+            InvokeItemCommand = new BaseDataCommand(ItemInvokeExec, IsItemData);
+            GetDockersCaptionCommand = new BaseDataCommand(GetDockersCaptionExec, IsDockers);
+            GetDockersGuidCommand = new BaseDataCommand(GetDockersGuidExec, IsDockers);
+            RemoveMeCommand = new BaseDataCommand(RemoveMeExec, IsSearchData);
+            HighLightCommand = new SimpleCommand(showHighLightItem);
+        }
         private bool IsDockers(IBasicData basicData)
         {
             if (basicData.TagName == "dockers")
@@ -121,10 +134,14 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
         }
         private bool IsDockerData(IBasicData basicData)
         {
+            if (!incorel)
+                return false;
             return IsTypeOf(basicData, typeof(DockerData));
         }
         private bool IsDialogData(IBasicData basicData)
         {
+            if (!incorel)
+                return false;
             return IsTypeOf(basicData, typeof(DialogData));
         }
         private bool IsSearchData(IBasicData basicData)
@@ -137,6 +154,8 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
         }
         private bool IsCommandBarData(IBasicData basicData)
         {
+            if (!incorel)
+                return false;
             return IsTypeOf(basicData, typeof(CommandBarData));
         }
         private bool IsTypeOf(IBasicData basicData, Type type)
@@ -145,8 +164,26 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
                 return true;
             return false;
         }
+        private bool HasGuid(IBasicData basicData)
+        {
+            if (!string.IsNullOrEmpty(basicData.Guid))
+                return true;
+            return false;
+        }
+        private void FindRefExec(DataClass.Attribute att)
+        {
+            core.FindByGuid(core.ListPrimaryItens.Childrens, att.Value) ;
+        }
+        private bool IsAttributeRef(DataClass.Attribute att)
+        {
+            if (att.Name == "guid")
+                return false;
+            return att.IsGuid;
+        }
+     
         private void ShowDialogExec(IBasicData basicData)
         {
+
             CorelCmd.ShowDialog(basicData.Guid);
         }
         private void HideDialogExec(IBasicData basicData)
@@ -232,23 +269,7 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
             core.DispactchNewMessage("Dockers Guids copied!", MsgType.Console);
             Clipboard.SetText(guid);
         }
-        private bool findRefItemCanExec(IBasicData basicData)
-        {
-            if (!string.IsNullOrEmpty(basicData.GuidRef))
-                return true;
-            return false;
-        }
-        private void findRefItemExec(IBasicData basicData)
-        {
-            basicData.Caption = CorelCmd.GetCaption(basicData.Guid);
-            core.FindByGuid(core.ListPrimaryItens.Childrens, basicData.GuidRef);
-        }
-        private bool HasGuid(IBasicData basicData)
-        {
-            if (!string.IsNullOrEmpty(basicData.Guid))
-                return true;
-            return false;
-        }
+    
         private void CopyGuidExec(IBasicData basicData)
         {
             System.Windows.Clipboard.SetText(basicData.Guid);
@@ -265,31 +286,8 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
             if (XmlDecode != null)
                 XmlDecode(basicData);
         }
-      
-        private void initializeCommands()
-        {
-            FindRefItemCommand = new BaseDataCommand(findRefItemExec, findRefItemCanExec);
-            CopyGuidCommand = new BaseDataCommand(CopyGuidExec, HasGuid);
 
-            FindCaptionRefCommand = new BaseDataCommand(CopyGuidExec, HasGuid);
-            FindGuidCommand = new BaseDataCommand(CopyGuidExec, HasGuid);
-            FindGuidRefCommand = new BaseDataCommand(findRefItemExec, HasGuid);
-            XmlCommand = new BaseDataCommand(XmlExec, IsTrue);
-            GetCaptionCommand = new BaseDataCommand(GetCaptionTextExec, HasGuid);
-            ShowCommandBarCommand = new BaseDataCommand(ShowCommandBarExec, IsCommandBarData);
-            HideCommandBarCommand = new BaseDataCommand(HideCommandBarExec, IsCommandBarData);
-            CommandBarModeCommand = new BaseDataCommand(CommandBarModeExec, IsCommandBarData);
-            ShowThisCommand = new BaseDataCommand(ShowItemExec, IsItemData);
-            HideThisCommand = new BaseDataCommand(CopyGuidExec, IsItemData);
-            ShowDialogCommand = new BaseDataCommand(ShowDialogExec, IsDialogData);
-            HideDialogCommand = new BaseDataCommand(HideDialogExec, IsDialogData);
-            ShowDockerCommand = new BaseDataCommand(ShowDockerExec, IsDockerData);
-            HideDockerCommand = new BaseDataCommand(HideDockerExec, IsDockerData);
-            InvokeItemCommand = new BaseDataCommand(ItemInvokeExec, IsItemData);
-            GetDockersCaptionCommand = new BaseDataCommand(GetDockersCaptionExec, IsDockers);
-            GetDockersGuidCommand = new BaseDataCommand(GetDockersGuidExec, IsDockers);
-            RemoveMeCommand = new BaseDataCommand(RemoveMeExec, IsSearchData);
-        }
+    
         private BlockingCollection<IBasicData> mainList;
         public BlockingCollection<IBasicData> MainList
         {
@@ -336,6 +334,7 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
         }
 
 
+        
         private void showHighLightItem()
         {
             core.CorelAutomation.ShowHighLightItem(core.Route);
@@ -355,5 +354,5 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
             this.ConsoleExpanded = !this.ConsoleExpanded;
         }
     }
-  
+
 }

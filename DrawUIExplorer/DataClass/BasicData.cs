@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace br.corp.bonus630.DrawUIExplorer.DataClass
 {
-    public abstract class BasicData<T> : ViewModelBase, IComparable, IBasicData 
+    public abstract class BasicData<T> : ViewModelBase, IComparable, IBasicData
     {
         public string Guid { get; set; }
         public string GuidRef { get; set; }
@@ -26,19 +26,29 @@ namespace br.corp.bonus630.DrawUIExplorer.DataClass
         private bool isSpecialType = false;
 
         public int XmlChildreID { get { return this.xmlChildreID; } }
-        public int XmlChildreParentID { get { return this.xmlChildreParentID; }  }
+        public int XmlChildreParentID { get { return this.xmlChildreParentID; } }
         public int TreeLevel { get { return this.treeLevel; } }
 
-        public List<Attribute> Attributes { get; set; }
+        private List<Attribute> attributes;
+        public List<Attribute> Attributes
+        {
+            get { return attributes; }
+            set { attributes = value; NotifyPropertyChanged(); }
+        }
         private ObservableCollection<IBasicData> childrens;
-        public ObservableCollection<IBasicData> Childrens { get { 
-                return childrens; } 
-            set {childrens = value; NotifyPropertyChanged(); } }
-        public bool IsSelected { get { return this.isSelected; }  }
+        public ObservableCollection<IBasicData> Childrens
+        {
+            get
+            {
+                return childrens;
+            }
+            set { childrens = value; NotifyPropertyChanged(); }
+        }
+        public bool IsSelected { get { return this.isSelected; } }
         public bool IsSpecialType { get { return this.isSpecialType; } }
         public IBasicData Parent { get; set; }
 
-        public event Action<bool,bool?,bool> SelectedEvent;
+        public event Action<bool, bool?, bool> SelectedEvent;
 
 
         public BasicData()
@@ -52,10 +62,10 @@ namespace br.corp.bonus630.DrawUIExplorer.DataClass
 
         private void setSpecialType()
         {
-            if (type == typeof(DockerData)|| type == typeof(CommandBarData) || type == typeof(DialogData))
+            if (type == typeof(DockerData) || type == typeof(CommandBarData) || type == typeof(DialogData))
                 this.isSpecialType = true;
 
-            
+
         }
 
         public void SetTreeLevel(int parentLevel)
@@ -74,7 +84,7 @@ namespace br.corp.bonus630.DrawUIExplorer.DataClass
             if (basicData.Guid == this.Guid)
                 return 0;
             return basicData.Guid.CompareTo(basicData.Guid);
-            
+
 
         }
         public Type GetType(IBasicData basicData)
@@ -138,7 +148,7 @@ namespace br.corp.bonus630.DrawUIExplorer.DataClass
         }
         public void Add(IBasicData basicData)
         {
-            if(childrens == null)
+            if (childrens == null)
                 childrens = new ObservableCollection<IBasicData>();
             this.childrens.Add(basicData);
             NotifyPropertyChanged("Childrens");
@@ -150,6 +160,7 @@ namespace br.corp.bonus630.DrawUIExplorer.DataClass
             IBasicData basicData = obj as IBasicData;
             if (basicData == null)
                 return false;
+           
             //This comparison can't still work in merge case
             if (this.TagName == basicData.TagName && this.Guid == basicData.Guid && this.XmlChildreID == basicData.XmlChildreID)
                 return true;
@@ -164,11 +175,11 @@ namespace br.corp.bonus630.DrawUIExplorer.DataClass
             return hashCode;
         }
 
-        public void SetSelected(bool isSelected,bool? isExpands, bool update,bool recursive = false)
+        public void SetSelected(bool isSelected, bool? isExpands, bool update, bool recursive = false)
         {
             this.isSelected = isSelected;
             if (SelectedEvent != null)
-                SelectedEvent(this.isSelected,isExpands,update);
+                SelectedEvent(this.isSelected, isExpands, update);
             NotifyPropertyChanged("IsSelected");
             if (recursive && this.Parent != null)
                 this.Parent.SetSelected(isSelected, isExpands, update, recursive);
@@ -185,7 +196,7 @@ namespace br.corp.bonus630.DrawUIExplorer.DataClass
         }
         public override string ToString()
         {
-            return string.Format("{0}[{1}]",this.TagName,this.XmlChildreID);
+            return string.Format("{0}[{1}]", this.TagName, this.XmlChildreID);
         }
 
         //public IEnumerator<T> GetEnumerator()
@@ -198,6 +209,6 @@ namespace br.corp.bonus630.DrawUIExplorer.DataClass
         //    throw new NotImplementedException();
         //}
     }
-  
-          
+
+
 }

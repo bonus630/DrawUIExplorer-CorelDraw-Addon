@@ -19,7 +19,6 @@ namespace br.corp.bonus630.DrawUIExplorer.Models
         {
             return System.Guid.NewGuid().ToString();
         }
-
         public string CQL(string cql)
         {
            return core.CorelApp.Evaluate(cql).ToString();
