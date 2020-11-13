@@ -13,7 +13,7 @@ namespace br.corp.bonus630.DrawUIExplorer.DataClass
     {
         public string Guid { get; set; }
         public string GuidRef { get; set; }
-        public string TagName { get; set; }
+        public virtual string TagName { get; set; }
         public int PathIndex { get; private set; }
 
         public string TagValue { get { if (Childrens == null || Childrens.Count == 0) return TagName; else return string.Format("{0} [{1}]", TagName, Childrens.Count); } }

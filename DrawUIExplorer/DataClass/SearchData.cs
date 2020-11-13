@@ -9,6 +9,9 @@ namespace br.corp.bonus630.DrawUIExplorer.DataClass
     public class SearchData : BasicData<SearchData>
     {
         public System.Guid ID { get; protected set; }
+
+        public override string TagName{ get { return "Search"; } set { } }
+
         public SearchData():base()
         {
             ID = System.Guid.NewGuid();

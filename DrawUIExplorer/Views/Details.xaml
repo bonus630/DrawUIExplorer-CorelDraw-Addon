@@ -110,15 +110,27 @@
                                   CommandParameter="{Binding}" Command="{Binding Path=DataContext.CopyCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" 
                                   >
                             <MenuItem.Icon>
-                                <Image Source="{Binding CopyMenuItemImg}" />
+                                <Image Style="{DynamicResource CopyMenuItemImg}" />
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem Header="Search Guid" Background="WhiteSmoke" 
+                        <MenuItem Header="Search by Guid" Background="WhiteSmoke" 
                                   CommandParameter="{Binding}" Command="{Binding Path=DataContext.SearchGuidCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" 
                                   
                                   Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolVisibilityConverter}}"                       
-                                  />
-
+                                  >
+                            <MenuItem.Icon>
+                                <Image Style="{DynamicResource SearchButtonImg}" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Search Item" Background="WhiteSmoke" 
+                                  CommandParameter="{Binding}" Command="{Binding Path=DataContext.SearchItemCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" 
+                                  
+                                  Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolVisibilityConverter}}"                       
+                                  >
+                            <MenuItem.Icon>
+                                <Image Style="{DynamicResource SearchButtonImg}" />
+                            </MenuItem.Icon>
+                        </MenuItem>
                         <MenuItem Header="Run Bind" Background="WhiteSmoke" 
                                   CommandParameter="{Binding}" Command="{Binding Path=DataContext.RunBindCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}"  
                                                             Visibility="{Binding Path=IsEnabled, RelativeSource={RelativeSource Self}, Mode=OneWay, Converter={StaticResource BoolVisibilityConverter}}"

@@ -192,7 +192,7 @@ namespace br.corp.bonus630.DrawUIExplorer.Models
         {
             corelApp.FrameWork.Automation.InvokeDialogItem(dialogGuid, itemGuid);
         }
-        public void RunBindDataSource(string value)
+        public void RunBindDataSource(string value,bool invoke = false)
         {
             string o = "";
             try
@@ -203,8 +203,15 @@ namespace br.corp.bonus630.DrawUIExplorer.Models
                 string datasource = match.Groups["datasource"].Value;
                 string path = match.Groups["path"].Value;
                 DataSourceProxy dsp = corelApp.FrameWork.Application.DataContext.GetDataSource(datasource);
-                object j = dsp.GetProperty(path);
-                o = string.Format("Type:{0} Value:{1}", j.GetType().Name, j);
+                if (invoke) 
+                {
+                    dsp.InvokeMethod(path);
+                }
+                else
+                {
+                    object j = dsp.GetProperty(path);
+                    o = string.Format("Type:{0} Value:{1}", j.GetType().Name, j);
+                }
             }
             catch (Exception erro)
             {

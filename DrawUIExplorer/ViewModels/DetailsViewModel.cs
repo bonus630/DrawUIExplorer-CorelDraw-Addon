@@ -20,12 +20,14 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
             corelApp = core.CorelApp;
             RunBindCommand = new ViewModels.Commands.AttributeCommand(attributeContentExec, attributeContentCanExec);
             RunMacroCommand = new ViewModels.Commands.AttributeCommand(attributeMacro, attributeCanMacro);
-            SearchGuidCommand = new ViewModels.Commands.AttributeCommand(attributeSerchGuid, attributeCanSerchGuid);
+            SearchGuidCommand = new ViewModels.Commands.AttributeCommand(attributeSearchGuid, attributeCanSearchGuid);
+            SearchItemCommand = new ViewModels.Commands.AttributeCommand(attributeSearchItem, attributeCanSearchItem);
             CopyCommand = new ViewModels.Commands.AttributeCommand(attributeCopy, attributeCanCopy);
         }
         public Commands.AttributeCommand RunBindCommand { get; set; }
         public Commands.AttributeCommand RunMacroCommand { get; set; }
         public Commands.AttributeCommand SearchGuidCommand { get; set; }
+        public Commands.AttributeCommand SearchItemCommand { get; set; }
         public Commands.AttributeCommand CopyCommand { get; set; }
         
 
@@ -131,15 +133,22 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
 
         private void attributeContentExec(Attribute attribute)
         {
-            corelAutomation.RunBindDataSource(attribute.Value);
+            bool invoke = false;
+            if (attribute.Name == "onInvoke")
+                invoke = true;
+            corelAutomation.RunBindDataSource(attribute.Value,invoke);
         }
         private void attributeMacro(Attribute attribute)
         {
             corelAutomation.RunMacro(attribute.Value);
         }
-        private void attributeSerchGuid(Attribute attribute)
+        private void attributeSearchGuid(Attribute attribute)
         {
             core.FindByGuid(core.ListPrimaryItens.Childrens, attribute.Value);
+        }
+        private void attributeSearchItem(Attribute attribute)
+        {
+            core.FindItemContainsGuidRef(core.ListPrimaryItens,attribute.Value);
         }
         private void attributeCopy(Attribute attribute)
         {
@@ -158,9 +167,15 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
             return false;
 
         }
-        private bool attributeCanSerchGuid(Attribute attribute)
+        private bool attributeCanSearchGuid(Attribute attribute)
         {
             return attribute.IsGuid;
+        }
+        private bool attributeCanSearchItem(Attribute attribute)
+        {
+            if(attribute.Name == "guid")
+                return attribute.IsGuid;
+            return false;
         }
         private bool attributeCanCopy(Attribute attribute)
         {

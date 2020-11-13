@@ -410,6 +410,14 @@ namespace br.corp.bonus630.DrawUIExplorer.Models
                     SearchFinished();
            
         }
+        public void SearchItemContainsGuidRefEvent(IBasicData list, string guid)
+        {
+            IBasicData result = SearchItemContainsGuidRef(list, guid, true);
+            searchResult = new SearchData();
+            searchResult.Add(result);
+            if (SearchResultEvent != null)
+                SearchResultEvent(searchResult);
+        }
         /// <summary>
         /// Não dispara o evento de pesquisa
         /// </summary>
@@ -441,6 +449,7 @@ namespace br.corp.bonus630.DrawUIExplorer.Models
                 return searchResult;
             }
         }
+      
         private void searchItemFromGuidRef(IBasicData list, string guid)
         {
             if (!searching)

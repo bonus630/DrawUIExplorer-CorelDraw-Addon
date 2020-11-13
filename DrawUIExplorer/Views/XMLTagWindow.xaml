@@ -134,7 +134,7 @@
 
                     <TreeView.ItemTemplate>
                         <HierarchicalDataTemplate  ItemsSource="{Binding Path=Childrens}">
-                            <HeaderedContentControl Header="{Binding Path=TagValue}"/>
+                            <HeaderedContentControl Header="{Binding Path=TagValue}" Focusable="False"/>
                             <!--<Label Content="{Binding Path=TagName}"/>-->
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>
@@ -157,7 +157,7 @@
 
                     <TreeView.ItemTemplate>
                         <HierarchicalDataTemplate  ItemsSource="{Binding Path=Childrens}">
-                            <HeaderedContentControl Header="{Binding Path=TagValue}"/>
+                            <HeaderedContentControl Header="{Binding Path=TagValue}" Focusable="False"/>
                             <!--<Label Content="{Binding Path=TagName}"/>-->
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>

@@ -176,7 +176,7 @@ namespace br.corp.bonus630.DrawUIExplorer.ViewModels
         }
         private bool IsAttributeRef(DataClass.Attribute att)
         {
-            if (att.Name == "guid")
+            if (att.Name == "guid" || att.Name == "guidRef")
                 return false;
             return att.IsGuid;
         }

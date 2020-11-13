@@ -241,6 +241,16 @@ namespace br.corp.bonus630.DrawUIExplorer
             searchEngine.SearchItemFromGuidRef(list, guid);
         }
         /// <summary>
+        /// Dispara o evento de pesquisa
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="guid"></param>
+        public void FindItemContainsGuidRef(IBasicData list,string guid)
+        {
+            searchEngine.NewSearch();
+            searchEngine.SearchItemContainsGuidRefEvent(list, guid);
+        }
+        /// <summary>
         /// Não dispara o evento de pesquisa
         /// </summary>
         /// <param name="list"></param>
